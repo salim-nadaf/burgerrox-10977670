@@ -8,13 +8,13 @@ const Footer = () => {
               BURGER ROX
             </h3>
             <p className="font-allura text-lg text-primary">
-              Your campus bestie for real food
+              Rockin' homemade flavor
             </p>
           </div>
 
           <div className="text-center">
             <p className="font-montserrat text-sm text-background/80">
-              © 2024 Burger Rox. All rights reserved.
+              © 2025 Burger Rox. All rights reserved.
             </p>
             <p className="font-montserrat text-xs text-background/60 mt-1">
               Made with ❤️ for students, by students
@@ -23,8 +23,8 @@ const Footer = () => {
 
           <div className="text-right">
             <div className="font-montserrat text-sm text-background/80">
-              <p>123 Campus Avenue</p>
-              <p>(555) 123-BURGERS</p>
+              <p>Urban Forest, Mamurdi</p>
+              <p>9970078688</p>
             </div>
           </div>
         </div>

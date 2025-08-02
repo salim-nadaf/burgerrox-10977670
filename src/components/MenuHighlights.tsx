@@ -5,21 +5,33 @@ import burgerTrio from "@/assets/burger-trio.jpg";
 const MenuHighlights = () => {
   const burgers = [
     {
-      name: "The Classic Rox",
-      description: "The OG that started it all. Beef patty, cheese, lettuce, tomato, our secret sauce.",
-      price: "$12",
+      name: "Burger Rox Zinger",
+      description: "Premium bun, signature sauce, and liquid cheese",
+      price: "₹259",
       popular: true
     },
     {
-      name: "Bacon Loaded",
-      description: "Because bacon makes everything better. Crispy bacon, cheese, onion rings.",
-      price: "$14",
+      name: "Chicken Classic",
+      description: "Classic burger with our signature twist",
+      price: "₹89",
       popular: false
     },
     {
-      name: "Veggie Vibes",
-      description: "Plant-based but full flavor. Avocado, sprouts, tomato, herb mayo.",
-      price: "$13",
+      name: "Veggie Blaze Crisp",
+      description: "Crispy patty, fresh veggies",
+      price: "₹79",
+      popular: false
+    },
+    {
+      name: "Aloo Tikki",
+      description: "Crispy Aloo Tikki, soft bun, and signature sauce",
+      price: "₹79",
+      popular: false
+    },
+    {
+      name: "Chicken Blaze Crisp",
+      description: "Crispy chicken, fresh veggies",
+      price: "₹99",
       popular: false
     }
   ];
@@ -32,7 +44,7 @@ const MenuHighlights = () => {
             MENU FAVORITES
           </h2>
           <p className="font-allura text-2xl md:text-3xl text-primary mb-6">
-            The stuff you actually want to eat
+            Rockin' homemade flavor
           </p>
           <p className="font-montserrat text-lg text-muted-foreground max-w-2xl mx-auto">
             We keep it simple with burgers that actually slap. No weird ingredients, 
@@ -68,8 +80,13 @@ const MenuHighlights = () => {
             ))}
             
             <div className="pt-6">
-              <Button variant="brand" size="lg" className="w-full sm:w-auto">
-                See Full Menu
+              <Button 
+                variant="brand" 
+                size="lg" 
+                className="w-full sm:w-auto"
+                onClick={() => window.open('https://wa.me/919970078688', '_blank')}
+              >
+                Order on WhatsApp
               </Button>
             </div>
           </div>
@@ -81,7 +98,7 @@ const MenuHighlights = () => {
               className="w-full rounded-2xl shadow-brand"
             />
             <div className="absolute -bottom-4 -right-4 bg-primary text-primary-foreground p-4 rounded-full font-bebas text-xl tracking-wider shadow-lg">
-              ALL UNDER $15!
+              STARTS AT ₹79!
             </div>
           </div>
         </div>

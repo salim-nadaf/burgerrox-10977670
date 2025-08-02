@@ -72,15 +72,15 @@ const About = () => {
           <div className="flex flex-wrap justify-center gap-4">
             <div className="bg-card rounded-lg p-4 min-w-[120px]">
               <div className="font-bebas text-2xl text-primary">500+</div>
-              <div className="font-montserrat text-sm text-muted-foreground">Happy Students</div>
+              <div className="font-montserrat text-sm text-muted-foreground">Burgers Sold</div>
             </div>
             <div className="bg-card rounded-lg p-4 min-w-[120px]">
-              <div className="font-bebas text-2xl text-primary">4.8★</div>
+              <div className="font-bebas text-2xl text-primary">4.6★</div>
               <div className="font-montserrat text-sm text-muted-foreground">Average Rating</div>
             </div>
             <div className="bg-card rounded-lg p-4 min-w-[120px]">
-              <div className="font-bebas text-2xl text-primary">15MIN</div>
-              <div className="font-montserrat text-sm text-muted-foreground">Avg Wait Time</div>
+              <div className="font-bebas text-2xl text-primary">30MIN</div>
+              <div className="font-montserrat text-sm text-muted-foreground">Delivery Time</div>
             </div>
           </div>
         </div>

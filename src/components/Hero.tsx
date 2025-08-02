@@ -25,7 +25,7 @@ const Hero = () => {
             </h3>
             
             <p className="font-allura text-3xl md:text-4xl text-foreground mt-4">
-              Your Campus Bestie for Real Food
+              Rockin' homemade flavor
             </p>
             
             <p className="font-montserrat text-lg md:text-xl text-muted-foreground max-w-2xl mx-auto leading-relaxed">
@@ -35,28 +35,33 @@ const Hero = () => {
             </p>
 
             <div className="flex flex-col sm:flex-row gap-4 justify-center items-center mt-8">
-              <Button variant="hero" size="xl" className="w-full sm:w-auto">
+              <Button 
+                variant="hero" 
+                size="xl" 
+                className="w-full sm:w-auto"
+                onClick={() => window.open('https://wa.me/919970078688', '_blank')}
+              >
                 Order Your Fix
               </Button>
               <Button variant="outline" size="xl" className="w-full sm:w-auto">
-                View Menu
+                <a href="#menu">View Menu</a>
               </Button>
             </div>
 
             <div className="flex items-center justify-center space-x-8 mt-12 text-center">
               <div className="font-montserrat">
-                <div className="font-bebas text-3xl text-primary">$8-15</div>
-                <div className="text-sm text-muted-foreground">Student Friendly</div>
+                <div className="font-bebas text-3xl text-primary">₹79-499</div>
+                <div className="text-sm text-muted-foreground">Affordable</div>
               </div>
               <div className="w-px h-12 bg-border"></div>
               <div className="font-montserrat">
-                <div className="font-bebas text-3xl text-primary">15MIN</div>
-                <div className="text-sm text-muted-foreground">Quick Service</div>
+                <div className="font-bebas text-3xl text-primary">30MIN</div>
+                <div className="text-sm text-muted-foreground">Quick Delivery</div>
               </div>
               <div className="w-px h-12 bg-border"></div>
               <div className="font-montserrat">
-                <div className="font-bebas text-3xl text-primary">5★</div>
-                <div className="text-sm text-muted-foreground">Student Rated</div>
+                <div className="font-bebas text-3xl text-primary">4.6★</div>
+                <div className="text-sm text-muted-foreground">Customer Rated</div>
               </div>
             </div>
           </div>

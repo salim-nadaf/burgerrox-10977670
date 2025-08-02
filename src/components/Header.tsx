@@ -26,16 +26,21 @@ const Header = () => {
           <div className="hidden lg:flex items-center space-x-4 text-sm font-montserrat">
             <div className="flex items-center space-x-1 text-muted-foreground">
               <Phone size={16} />
-              <span>(555) 123-BURGERS</span>
+              <span>9970078688</span>
             </div>
             <div className="flex items-center space-x-1 text-muted-foreground">
               <MapPin size={16} />
-              <span>Campus District</span>
+              <span>Urban Forest, Mamurdi</span>
             </div>
           </div>
 
           <div className="flex items-center space-x-4">
-            <Button variant="brand" size="lg" className="hidden md:flex">
+            <Button 
+              variant="brand" 
+              size="lg" 
+              className="hidden md:flex"
+              onClick={() => window.open('https://wa.me/919970078688', '_blank')}
+            >
               Order Now
             </Button>
             <Button variant="ghost" size="icon" className="md:hidden">

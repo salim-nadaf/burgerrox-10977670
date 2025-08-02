@@ -28,9 +28,8 @@ const Contact = () => {
                       LOCATION
                     </h3>
                     <p className="font-montserrat text-muted-foreground">
-                      123 Campus Avenue<br />
-                      University District<br />
-                      StudentCity, SC 12345
+                      Urban Forest, Mamurdi<br />
+                      Pune-412101
                     </p>
                   </div>
                 </div>
@@ -48,9 +47,8 @@ const Contact = () => {
                       HOURS
                     </h3>
                     <div className="font-montserrat text-muted-foreground space-y-1">
-                      <p>Monday - Thursday: 11AM - 11PM</p>
-                      <p>Friday - Saturday: 11AM - 2AM</p>
-                      <p>Sunday: 12PM - 10PM</p>
+                      <p>Mon-Thu, Sat-Sun: 11AM - 9:30PM</p>
+                      <p>Friday: 4PM - 9:30PM</p>
                     </div>
                   </div>
                 </div>
@@ -68,9 +66,9 @@ const Contact = () => {
                       CONTACT
                     </h3>
                     <div className="font-montserrat text-muted-foreground space-y-1">
-                      <p>Phone: (555) 123-BURGERS</p>
-                      <p>Orders: orders@burgerrox.com</p>
-                      <p>General: hello@burgerrox.com</p>
+                      <p>Phone: 9970078688</p>
+                      <p>Orders: 9321389985</p>
+                      <p>WhatsApp Orders Available</p>
                     </div>
                   </div>
                 </div>
@@ -84,13 +82,23 @@ const Contact = () => {
                 READY TO ROX?
               </h3>
               <p className="font-montserrat text-muted-foreground mb-6">
-                Order ahead or just drop by. We're always ready to serve up something good.
+                We deliver fresh, delicious burgers right to your door. Order via WhatsApp for quick service.
               </p>
               <div className="space-y-4">
-                <Button variant="brand" size="lg" className="w-full">
-                  Order Online
+                <Button 
+                  variant="brand" 
+                  size="lg" 
+                  className="w-full"
+                  onClick={() => window.open('https://wa.me/919970078688', '_blank')}
+                >
+                  Order on WhatsApp
                 </Button>
-                <Button variant="outline" size="lg" className="w-full">
+                <Button 
+                  variant="outline" 
+                  size="lg" 
+                  className="w-full"
+                  onClick={() => window.open('tel:9970078688', '_blank')}
+                >
                   Call to Order
                 </Button>
               </div>

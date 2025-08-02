@@ -29,14 +29,17 @@ export default function AuthForm({ onClose }: AuthFormProps) {
 
     try {
       if (isLogin) {
+        console.log('Attempting login with:', formData.email);
         const { error } = await signIn(formData.email, formData.password);
         if (error) {
+          console.error('Login error:', error);
           toast({
             title: "Login Failed",
             description: error.message,
             variant: "destructive"
           });
         } else {
+          console.log('Login successful');
           toast({
             title: "Welcome back!",
             description: "You have successfully logged in",
@@ -50,9 +53,11 @@ export default function AuthForm({ onClose }: AuthFormProps) {
             description: "Please fill in all required fields",
             variant: "destructive"
           });
+          setLoading(false);
           return;
         }
 
+        console.log('Attempting signup with:', formData.email, formData.name);
         const { error } = await signUp(
           formData.email,
           formData.password,
@@ -62,20 +67,23 @@ export default function AuthForm({ onClose }: AuthFormProps) {
         );
 
         if (error) {
+          console.error('Signup error:', error);
           toast({
             title: "Signup Failed",
             description: error.message,
             variant: "destructive"
           });
         } else {
+          console.log('Signup successful');
           toast({
             title: "Account Created!",
-            description: "Please check your email to verify your account",
+            description: "Welcome to Burger Rox! You can now start ordering.",
           });
           onClose();
         }
       }
     } catch (error) {
+      console.error('Auth error:', error);
       toast({
         title: "Error",
         description: "An unexpected error occurred",
@@ -100,7 +108,7 @@ export default function AuthForm({ onClose }: AuthFormProps) {
         <CardDescription>
           {isLogin 
             ? 'Enter your credentials to access your account' 
-            : 'Create your account to start ordering'
+            : 'Create your account to start ordering delicious burgers'
           }
         </CardDescription>
       </CardHeader>
@@ -114,6 +122,7 @@ export default function AuthForm({ onClose }: AuthFormProps) {
               type="email"
               value={formData.email}
               onChange={handleInputChange}
+              placeholder="your.email@example.com"
               required
             />
           </div>
@@ -126,7 +135,9 @@ export default function AuthForm({ onClose }: AuthFormProps) {
               type="password"
               value={formData.password}
               onChange={handleInputChange}
+              placeholder="Enter your password"
               required
+              minLength={6}
             />
           </div>
 
@@ -140,6 +151,7 @@ export default function AuthForm({ onClose }: AuthFormProps) {
                   type="text"
                   value={formData.name}
                   onChange={handleInputChange}
+                  placeholder="Your full name"
                   required
                 />
               </div>
@@ -173,7 +185,7 @@ export default function AuthForm({ onClose }: AuthFormProps) {
           )}
 
           <Button type="submit" className="w-full" disabled={loading}>
-            {loading ? 'Please wait...' : (isLogin ? 'Login' : 'Sign Up')}
+            {loading ? 'Please wait...' : (isLogin ? 'Login' : 'Create Account')}
           </Button>
 
           <div className="text-center">

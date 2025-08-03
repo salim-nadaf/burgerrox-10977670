@@ -6,7 +6,7 @@ interface AuthContextType {
   user: User | null;
   session: Session | null;
   profile: any | null;
-  signUp: (email: string, password: string, name: string, whatsapp: string, area: string) => Promise<{ error: any }>;
+  signUp: (email: string, password: string, name: string, whatsapp: string, area: string) => Promise<{ error: any; needsConfirmation?: boolean; message?: string }>;
   signIn: (email: string, password: string) => Promise<{ error: any }>;
   signOut: () => Promise<void>;
   loading: boolean;
@@ -100,7 +100,17 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
     });
 
     console.log('Signup result:', { data, error });
-    return { error };
+    
+    // Check if email confirmation is required
+    if (data?.user && !data?.session && !error) {
+      return { 
+        error: null, 
+        needsConfirmation: true,
+        message: "Please check your email to confirm your account before logging in."
+      };
+    }
+    
+    return { error, needsConfirmation: false };
   };
 
   const signIn = async (email: string, password: string) => {

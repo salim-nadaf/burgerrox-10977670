@@ -58,7 +58,7 @@ export default function AuthForm({ onClose }: AuthFormProps) {
         }
 
         console.log('Attempting signup with:', formData.email, formData.name);
-        const { error } = await signUp(
+        const { error, needsConfirmation, message } = await signUp(
           formData.email,
           formData.password,
           formData.name,
@@ -73,11 +73,11 @@ export default function AuthForm({ onClose }: AuthFormProps) {
             description: error.message,
             variant: "destructive"
           });
-        } else {
-          console.log('Signup successful');
+        } else if (needsConfirmation) {
+          console.log('Signup successful - confirmation needed');
           toast({
             title: "Account Created!",
-            description: "Please check your email to confirm your account before logging in.",
+            description: message || "Please check your email to confirm your account before logging in.",
           });
           // Switch to login mode after successful signup
           setIsLogin(true);
@@ -89,6 +89,13 @@ export default function AuthForm({ onClose }: AuthFormProps) {
             whatsapp: '',
             area: ''
           }));
+        } else {
+          console.log('Signup successful - logged in immediately');
+          toast({
+            title: "Welcome to Burger Rox!",
+            description: "Your account has been created and you're now logged in.",
+          });
+          onClose();
         }
       }
     } catch (error) {

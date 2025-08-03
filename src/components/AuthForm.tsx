@@ -4,7 +4,7 @@ import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { useAuth } from '@/hooks/useAuth';
-import { toast } from '@/components/ui/use-toast';
+import { toast } from '@/hooks/use-toast';
 
 interface AuthFormProps {
   onClose: () => void;
@@ -77,9 +77,18 @@ export default function AuthForm({ onClose }: AuthFormProps) {
           console.log('Signup successful');
           toast({
             title: "Account Created!",
-            description: "Welcome to Burger Rox! You can now start ordering.",
+            description: "Please check your email to confirm your account before logging in.",
           });
-          onClose();
+          // Switch to login mode after successful signup
+          setIsLogin(true);
+          // Clear form data except email
+          setFormData(prev => ({
+            email: prev.email,
+            password: '',
+            name: '',
+            whatsapp: '',
+            area: ''
+          }));
         }
       }
     } catch (error) {

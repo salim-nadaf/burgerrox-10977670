@@ -3,7 +3,7 @@ import { Link } from 'react-router-dom';
 import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
-import { Dialog, DialogContent, DialogTrigger } from "@/components/ui/dialog";
+import { Dialog, DialogContent, DialogTrigger, DialogTitle, DialogDescription } from "@/components/ui/dialog";
 import burgerTrio from "@/assets/burger-trio.jpg";
 import { useCart } from "@/hooks/useCart";
 import { useAuth } from "@/hooks/useAuth";
@@ -145,6 +145,8 @@ const MenuPage = ({ showAll = false }: MenuPageProps) => {
                         </Button>
                       </DialogTrigger>
                       <DialogContent className="sm:max-w-md max-h-[90vh] overflow-y-auto">
+                        <DialogTitle className="sr-only">Authentication</DialogTitle>
+                        <DialogDescription className="sr-only">Login or create an account to add items to cart</DialogDescription>
                         <AuthForm onClose={() => setAuthDialogOpen(false)} />
                       </DialogContent>
                     </Dialog>

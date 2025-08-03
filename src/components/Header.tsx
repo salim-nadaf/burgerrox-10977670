@@ -1,6 +1,6 @@
 import { useState } from "react";
 import { Button } from "@/components/ui/button";
-import { Dialog, DialogContent, DialogTrigger } from "@/components/ui/dialog";
+import { Dialog, DialogContent, DialogTrigger, DialogTitle, DialogDescription } from "@/components/ui/dialog";
 import { Sheet, SheetContent, SheetTrigger, SheetHeader, SheetTitle } from "@/components/ui/sheet";
 import { Menu, Phone, MapPin, User, LogOut, X } from "lucide-react";
 import { Link, useLocation } from "react-router-dom";
@@ -83,6 +83,8 @@ const Header = () => {
                     </Button>
                   </DialogTrigger>
                   <DialogContent>
+                    <DialogTitle className="sr-only">Authentication</DialogTitle>
+                    <DialogDescription className="sr-only">Login or create an account</DialogDescription>
                     <AuthForm onClose={() => setAuthDialogOpen(false)} />
                   </DialogContent>
                 </Dialog>
@@ -135,6 +137,8 @@ const Header = () => {
                             </Button>
                           </DialogTrigger>
                           <DialogContent>
+                            <DialogTitle className="sr-only">Authentication</DialogTitle>
+                            <DialogDescription className="sr-only">Login or create an account</DialogDescription>
                             <AuthForm onClose={handleAuthClose} />
                           </DialogContent>
                         </Dialog>

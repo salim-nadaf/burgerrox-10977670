@@ -3,9 +3,11 @@ import { Link } from 'react-router-dom';
 import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
+import { Dialog, DialogContent, DialogTrigger } from "@/components/ui/dialog";
 import burgerTrio from "@/assets/burger-trio.jpg";
 import { useCart } from "@/hooks/useCart";
 import { useAuth } from "@/hooks/useAuth";
+import AuthForm from "./AuthForm";
 
 const allMenuItems = [
   // Fries
@@ -57,6 +59,7 @@ const MenuPage = ({ showAll = false }: MenuPageProps) => {
   const { addToCart } = useCart();
   const { user } = useAuth();
   const [selectedCategory, setSelectedCategory] = useState<string>('All');
+  const [authDialogOpen, setAuthDialogOpen] = useState(false);
 
   const displayItems = showAll ? allMenuItems : allMenuItems.slice(0, 6);
   const categories = ["All", "Fries", "Sides", "Chicken", "Egg", "Vegetarian", "Combos", "Beverages", "Desserts"];
@@ -127,13 +130,25 @@ const MenuPage = ({ showAll = false }: MenuPageProps) => {
                   <p className="font-montserrat text-muted-foreground leading-relaxed mb-4">
                     {burger.description}
                   </p>
-                  <Button 
-                    onClick={() => handleAddToCart(burger.name, burger.price)}
-                    className="w-full"
-                    disabled={!user}
-                  >
-                    {user ? 'Add to Cart' : 'Login to Add'}
-                  </Button>
+                  {user ? (
+                    <Button 
+                      onClick={() => handleAddToCart(burger.name, burger.price)}
+                      className="w-full"
+                    >
+                      Add to Cart
+                    </Button>
+                  ) : (
+                    <Dialog open={authDialogOpen} onOpenChange={setAuthDialogOpen}>
+                      <DialogTrigger asChild>
+                        <Button className="w-full">
+                          Login to Add
+                        </Button>
+                      </DialogTrigger>
+                      <DialogContent>
+                        <AuthForm onClose={() => setAuthDialogOpen(false)} />
+                      </DialogContent>
+                    </Dialog>
+                  )}
                 </CardContent>
               </Card>
             ))}

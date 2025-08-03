@@ -21,18 +21,23 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
+    console.log('useAuth: Setting up auth listener...');
+    
     // Set up auth state listener FIRST
     const { data: { subscription } } = supabase.auth.onAuthStateChange(
       (event, session) => {
+        console.log('Auth state changed:', event, 'Session:', session?.user?.id);
         setSession(session);
         setUser(session?.user ?? null);
         
         // Fetch profile data when user signs in
         if (session?.user) {
           setTimeout(() => {
+            console.log('Fetching profile for user:', session.user.id);
             fetchUserProfile(session.user.id);
           }, 0);
         } else {
+          console.log('No user session, clearing profile');
           setProfile(null);
         }
         setLoading(false);
@@ -50,7 +55,10 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
       setLoading(false);
     });
 
-    return () => subscription.unsubscribe();
+    return () => {
+      console.log('Cleaning up auth subscription');
+      subscription.unsubscribe();
+    };
   }, []);
 
   const fetchUserProfile = async (userId: string) => {

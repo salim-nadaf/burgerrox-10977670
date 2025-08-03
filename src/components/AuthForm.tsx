@@ -102,19 +102,17 @@ export default function AuthForm({ onClose }: AuthFormProps) {
   };
 
   return (
-    <div className="w-full max-w-md mx-auto max-h-[80vh] overflow-y-auto">
-      <Card className="w-full">
-      <CardHeader>
-        <CardTitle>{isLogin ? 'Login' : 'Sign Up'}</CardTitle>
-        <CardDescription>
+    <div className="w-full">
+      <div className="text-center mb-6">
+        <h2 className="text-2xl font-bold">{isLogin ? 'Login' : 'Sign Up'}</h2>
+        <p className="text-muted-foreground mt-2">
           {isLogin 
             ? 'Enter your credentials to access your account' 
             : 'Create your account to start ordering delicious burgers'
           }
-        </CardDescription>
-      </CardHeader>
-      <CardContent>
-        <form onSubmit={handleSubmit} className="space-y-4">
+        </p>
+      </div>
+      <form onSubmit={handleSubmit} className="space-y-4">
           <div className="space-y-2">
             <Label htmlFor="email">Email</Label>
             <Input
@@ -189,7 +187,7 @@ export default function AuthForm({ onClose }: AuthFormProps) {
             {loading ? 'Please wait...' : (isLogin ? 'Login' : 'Create Account')}
           </Button>
 
-          <div className="text-center">
+          <div className="text-center mt-4">
             <button
               type="button"
               onClick={() => setIsLogin(!isLogin)}
@@ -202,8 +200,6 @@ export default function AuthForm({ onClose }: AuthFormProps) {
             </button>
           </div>
         </form>
-      </CardContent>
-    </Card>
     </div>
   );
 }

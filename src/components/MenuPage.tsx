@@ -144,7 +144,7 @@ const MenuPage = ({ showAll = false }: MenuPageProps) => {
                           Login to Add
                         </Button>
                       </DialogTrigger>
-                      <DialogContent>
+                      <DialogContent className="sm:max-w-md max-h-[90vh] overflow-y-auto">
                         <AuthForm onClose={() => setAuthDialogOpen(false)} />
                       </DialogContent>
                     </Dialog>

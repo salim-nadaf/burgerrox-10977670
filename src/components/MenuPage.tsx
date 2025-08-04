@@ -5,9 +5,29 @@ import { Card, CardContent } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Dialog, DialogContent, DialogTrigger, DialogTitle, DialogDescription } from "@/components/ui/dialog";
 import burgerTrio from "@/assets/burger-trio.jpg";
+import friesImage from "@/assets/fries.jpg";
+import nuggetsImage from "@/assets/nuggets.jpg";
+import chickenBurgerImage from "@/assets/chicken-burger.jpg";
+import eggBurgerImage from "@/assets/egg-burger.jpg";
+import veggieBurgerImage from "@/assets/veggie-burger.jpg";
+import comboMealImage from "@/assets/combo-meal.jpg";
+import cokeImage from "@/assets/coca-cola.jpg";
+import lavaCakeImage from "@/assets/lava-cake.jpg";
 import { useCart } from "@/hooks/useCart";
 import { useAuth } from "@/hooks/useAuth";
 import AuthForm from "./AuthForm";
+
+const getItemImage = (name: string, category: string) => {
+  if (name.includes("Fries")) return friesImage;
+  if (name.includes("Nuggests")) return nuggetsImage;
+  if (category === "Chicken") return chickenBurgerImage;
+  if (category === "Egg") return eggBurgerImage;
+  if (category === "Vegetarian") return veggieBurgerImage;
+  if (category === "Combos") return comboMealImage;
+  if (name.includes("Coke")) return cokeImage;
+  if (name.includes("Lava Cake")) return lavaCakeImage;
+  return chickenBurgerImage; // default
+};
 
 const allMenuItems = [
   // Fries
@@ -119,7 +139,14 @@ const MenuPage = ({ showAll = false }: MenuPageProps) => {
             {filteredItems.map((burger, index) => (
               <Card key={index} className="border-2 border-border hover:border-primary transition-all duration-300 hover:shadow-brand">
                 <CardContent className="p-6">
-                   <div className="flex justify-between items-start mb-3">
+                  <div className="flex gap-4 mb-4">
+                    <img 
+                      src={getItemImage(burger.name, burger.category)} 
+                      alt={burger.name}
+                      className="w-20 h-20 rounded-lg object-cover"
+                    />
+                    <div className="flex-1">
+                      <div className="flex justify-between items-start mb-3">
                      <div className="flex items-center space-x-3">
                        <h3 className="font-bebas text-2xl text-foreground tracking-wide">
                          {burger.name}
@@ -134,11 +161,13 @@ const MenuPage = ({ showAll = false }: MenuPageProps) => {
                        <span className="font-bebas text-2xl text-primary">
                          ₹{burger.price}
                        </span>
-                     )}
-                   </div>
-                   <p className="font-montserrat text-muted-foreground leading-relaxed mb-4">
-                     {burger.description}
-                   </p>
+                      )}
+                    </div>
+                    </div>
+                  </div>
+                  <p className="font-montserrat text-muted-foreground leading-relaxed mb-4">
+                    {burger.description}
+                  </p>
                    
                    {(burger as any).variants ? (
                      <div className="space-y-2">

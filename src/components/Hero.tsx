@@ -9,9 +9,9 @@ const Hero = () => {
          <img 
           src={heroImage} 
           alt="Delicious Burger Rox burger" 
-          className="w-full h-full object-cover opacity-30"
+          className="w-full h-full object-cover opacity-50"
         />
-        <div className="absolute inset-0 bg-gradient-to-r from-background/80 to-background/60"></div>
+        <div className="absolute inset-0 bg-gradient-to-r from-background/60 to-background/40"></div>
       </div>
 
       <div className="container mx-auto px-4 z-10">

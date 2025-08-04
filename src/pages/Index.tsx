@@ -5,6 +5,7 @@ import About from "@/components/About";
 import Contact from "@/components/Contact";
 import Footer from "@/components/Footer";
 import WelcomeMessage from "@/components/WelcomeMessage";
+import LoginIncentive from "@/components/LoginIncentive";
 
 const Index = () => {
   return (
@@ -13,6 +14,7 @@ const Index = () => {
       <main>
         <Hero />
         <WelcomeMessage />
+        <LoginIncentive />
         <MenuHighlights />
         <About />
         <Contact />

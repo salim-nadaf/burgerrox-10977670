@@ -23,8 +23,61 @@ export default function AuthForm({ onClose }: AuthFormProps) {
 
   const { signIn, signUp } = useAuth();
 
+  const validateForm = () => {
+    // Email validation - must end with .com
+    if (!formData.email.endsWith('.com')) {
+      toast({
+        title: "Invalid Email",
+        description: "Email must end with .com",
+        variant: "destructive"
+      });
+      return false;
+    }
+
+    // Password validation - 8 chars, uppercase, lowercase, special char
+    const passwordRegex = /^(?=.*[a-z])(?=.*[A-Z])(?=.*[!@#$%^&*(),.?":{}|<>]).{8,}$/;
+    if (!passwordRegex.test(formData.password)) {
+      toast({
+        title: "Invalid Password",
+        description: "Password must be 8+ characters with uppercase, lowercase, and special character",
+        variant: "destructive"
+      });
+      return false;
+    }
+
+    if (!isLogin) {
+      // Phone validation - exactly 10 digits
+      const phoneRegex = /^\d{10}$/;
+      if (!phoneRegex.test(formData.whatsapp)) {
+        toast({
+          title: "Invalid Phone Number",
+          description: "Phone number must be exactly 10 digits",
+          variant: "destructive"
+        });
+        return false;
+      }
+
+      // Area validation - at least 4 letters
+      if (formData.area.length < 4) {
+        toast({
+          title: "Invalid Area",
+          description: "Area must be at least 4 characters long",
+          variant: "destructive"
+        });
+        return false;
+      }
+    }
+
+    return true;
+  };
+
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
+    
+    if (!validateForm()) {
+      return;
+    }
+    
     setLoading(true);
 
     try {
@@ -139,6 +192,7 @@ export default function AuthForm({ onClose }: AuthFormProps) {
               onChange={handleInputChange}
               placeholder="your.email@example.com"
               required
+              pattern=".*\.com$"
             />
           </div>
           
@@ -152,7 +206,7 @@ export default function AuthForm({ onClose }: AuthFormProps) {
               onChange={handleInputChange}
               placeholder="Enter your password"
               required
-              minLength={6}
+              minLength={8}
             />
           </div>
 
@@ -179,8 +233,10 @@ export default function AuthForm({ onClose }: AuthFormProps) {
                   type="tel"
                   value={formData.whatsapp}
                   onChange={handleInputChange}
-                  placeholder="919970078688"
+                  placeholder="9970078688"
                   required
+                  pattern="\d{10}"
+                  maxLength={10}
                 />
               </div>
 
@@ -194,6 +250,7 @@ export default function AuthForm({ onClose }: AuthFormProps) {
                   onChange={handleInputChange}
                   placeholder="Urban Forest, Mamurdi"
                   required
+                  minLength={4}
                 />
               </div>
             </>

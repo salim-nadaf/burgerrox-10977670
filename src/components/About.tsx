@@ -4,8 +4,8 @@ const About = () => {
   const features = [
     {
       icon: Users,
-      title: "Student-First",
-      description: "Built by students, for students. We get the late-night cravings and tight budgets."
+      title: "Family-First",
+      description: "Started by a loving mother known for her incredible homemade cooking, creating delicious meals with extra care for her special needs child."
     },
     {
       icon: DollarSign,
@@ -15,12 +15,12 @@ const About = () => {
     {
       icon: Clock,
       title: "Quick & Fresh",
-      description: "15-minute service because you've got places to be. Made fresh, served fast."
+      description: "30-minute delivery because you've got places to be. Made fresh, served fast."
     },
     {
       icon: Heart,
-      title: "No-Fuss Vibes",
-      description: "Chill atmosphere, good music, and food that just hits. Your comfort zone for comfort food."
+      title: "No-Fuss Delivery",
+      description: "Hassle-free delivery service and food that just hits. Your comfort food delivered to your comfort zone."
     }
   ];
 
@@ -35,9 +35,9 @@ const About = () => {
             More than just burgers, we're your campus crew
           </p>
           <p className="font-montserrat text-lg text-muted-foreground max-w-3xl mx-auto leading-relaxed">
-            Started by a group of college friends who were tired of expensive, mediocre food around campus. 
-            We wanted to create a spot where you could grab an amazing burger without the stress – 
-            good vibes, great food, and prices that don't hurt.
+            Born from a mother's kitchen, known throughout the neighborhood for her exceptional homemade cooking. 
+            What started as preparing special meals for her beloved down syndrome child grew into a passion for 
+            creating wholesome, delicious food that brings families together – authentic flavors made with love.
           </p>
         </div>
 

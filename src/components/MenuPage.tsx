@@ -11,12 +11,16 @@ import AuthForm from "./AuthForm";
 
 const allMenuItems = [
   // Fries
-  { name: "French Fries (Small)", description: "Golden crispy potato fries", price: 59, popular: true, category: "Fries" },
-  { name: "French Fries (Medium)", description: "Golden crispy potato fries", price: 109, popular: false, category: "Fries" },
-  { name: "French Fries (Large)", description: "Golden crispy potato fries", price: 129, popular: false, category: "Fries" },
-  { name: "Peri Peri French Fries (Small)", description: "Spicy peri peri seasoned fries", price: 69, popular: true, category: "Fries" },
-  { name: "Peri Peri French Fries (Medium)", description: "Spicy peri peri seasoned fries", price: 119, popular: false, category: "Fries" },
-  { name: "Peri Peri French Fries (Large)", description: "Spicy peri peri seasoned fries", price: 149, popular: false, category: "Fries" },
+  { name: "Salted Fries", description: "Golden crispy potato fries", price: 59, popular: true, category: "Fries", variants: [
+    { size: "Small", price: 59 },
+    { size: "Medium", price: 109 },
+    { size: "Large", price: 129 }
+  ]},
+  { name: "Peri Peri Fries", description: "Spicy peri peri seasoned fries", price: 69, popular: true, category: "Fries", variants: [
+    { size: "Small", price: 69 },
+    { size: "Medium", price: 119 },
+    { size: "Large", price: 149 }
+  ]},
   
   // Sides
   { name: "Nuggests", description: "Crispy chicken nuggets", price: 89, popular: true, category: "Sides" },
@@ -44,8 +48,10 @@ const allMenuItems = [
   { name: "Zinger Value meal", description: "Zinger value combo meal", price: 379, popular: false, category: "Combos" },
   
   // Beverages
-  { name: "Coke (Medium)", description: "Refreshing coca cola", price: 69, popular: true, category: "Beverages" },
-  { name: "Coke (Large)", description: "Refreshing coca cola large", price: 99, popular: false, category: "Beverages" },
+  { name: "Coke", description: "Refreshing coca cola", price: 69, popular: true, category: "Beverages", variants: [
+    { size: "Medium", price: 69 },
+    { size: "Large", price: 99 }
+  ]},
   
   // Desserts
   { name: "Molten Choco Lava Cake", description: "Hot chocolate lava cake", price: 79, popular: true, category: "Desserts" },
@@ -113,45 +119,82 @@ const MenuPage = ({ showAll = false }: MenuPageProps) => {
             {filteredItems.map((burger, index) => (
               <Card key={index} className="border-2 border-border hover:border-primary transition-all duration-300 hover:shadow-brand">
                 <CardContent className="p-6">
-                  <div className="flex justify-between items-start mb-3">
-                    <div className="flex items-center space-x-3">
-                      <h3 className="font-bebas text-2xl text-foreground tracking-wide">
-                        {burger.name}
-                      </h3>
-                      {burger.popular && (
-                        <Badge variant="default" className="bg-primary text-primary-foreground">
-                          POPULAR
-                        </Badge>
-                      )}
-                    </div>
-                    <span className="font-bebas text-2xl text-primary">
-                      ₹{burger.price}
-                    </span>
-                  </div>
-                  <p className="font-montserrat text-muted-foreground leading-relaxed mb-4">
-                    {burger.description}
-                  </p>
-                  {user ? (
-                    <Button 
-                      onClick={() => handleAddToCart(burger.name, burger.price)}
-                      className="w-full"
-                    >
-                      Add to Cart
-                    </Button>
-                  ) : (
-                    <Dialog open={authDialogOpen} onOpenChange={setAuthDialogOpen}>
-                      <DialogTrigger asChild>
-                        <Button className="w-full">
-                          Login to Add
-                        </Button>
-                      </DialogTrigger>
-                      <DialogContent className="sm:max-w-md max-h-[90vh] overflow-y-auto">
-                        <DialogTitle className="sr-only">Authentication</DialogTitle>
-                        <DialogDescription className="sr-only">Login or create an account to add items to cart</DialogDescription>
-                        <AuthForm onClose={() => setAuthDialogOpen(false)} />
-                      </DialogContent>
-                    </Dialog>
-                  )}
+                   <div className="flex justify-between items-start mb-3">
+                     <div className="flex items-center space-x-3">
+                       <h3 className="font-bebas text-2xl text-foreground tracking-wide">
+                         {burger.name}
+                       </h3>
+                       {burger.popular && (
+                         <Badge variant="default" className="bg-primary text-primary-foreground">
+                           POPULAR
+                         </Badge>
+                       )}
+                     </div>
+                     {!(burger as any).variants && (
+                       <span className="font-bebas text-2xl text-primary">
+                         ₹{burger.price}
+                       </span>
+                     )}
+                   </div>
+                   <p className="font-montserrat text-muted-foreground leading-relaxed mb-4">
+                     {burger.description}
+                   </p>
+                   
+                   {(burger as any).variants ? (
+                     <div className="space-y-2">
+                       {(burger as any).variants.map((variant: any, variantIndex: number) => (
+                         <div key={variantIndex} className="flex justify-between items-center p-3 border rounded-lg">
+                           <span className="font-montserrat text-foreground">{variant.size}</span>
+                           <div className="flex items-center space-x-3">
+                             <span className="font-bebas text-lg text-primary">₹{variant.price}</span>
+                             {user ? (
+                               <Button 
+                                 onClick={() => handleAddToCart(`${burger.name} (${variant.size})`, variant.price)}
+                                 size="sm"
+                               >
+                                 Add
+                               </Button>
+                             ) : (
+                               <Dialog open={authDialogOpen} onOpenChange={setAuthDialogOpen}>
+                                 <DialogTrigger asChild>
+                                   <Button size="sm">
+                                     Login
+                                   </Button>
+                                 </DialogTrigger>
+                                 <DialogContent className="sm:max-w-md max-h-[90vh] overflow-y-auto">
+                                   <DialogTitle className="sr-only">Authentication</DialogTitle>
+                                   <DialogDescription className="sr-only">Login or create an account to add items to cart</DialogDescription>
+                                   <AuthForm onClose={() => setAuthDialogOpen(false)} />
+                                 </DialogContent>
+                               </Dialog>
+                             )}
+                           </div>
+                         </div>
+                       ))}
+                     </div>
+                   ) : (
+                     user ? (
+                       <Button 
+                         onClick={() => handleAddToCart(burger.name, burger.price)}
+                         className="w-full"
+                       >
+                         Add to Cart
+                       </Button>
+                     ) : (
+                       <Dialog open={authDialogOpen} onOpenChange={setAuthDialogOpen}>
+                         <DialogTrigger asChild>
+                           <Button className="w-full">
+                             Login to Add
+                           </Button>
+                         </DialogTrigger>
+                         <DialogContent className="sm:max-w-md max-h-[90vh] overflow-y-auto">
+                           <DialogTitle className="sr-only">Authentication</DialogTitle>
+                           <DialogDescription className="sr-only">Login or create an account to add items to cart</DialogDescription>
+                           <AuthForm onClose={() => setAuthDialogOpen(false)} />
+                         </DialogContent>
+                       </Dialog>
+                     )
+                   )}
                 </CardContent>
               </Card>
             ))}

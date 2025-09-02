@@ -50,7 +50,7 @@ const Hero = () => {
 
             <div className="flex items-center justify-center space-x-8 mt-12 text-center">
               <div className="font-montserrat">
-                <div className="font-bebas text-3xl text-primary">₹79-499</div>
+                <div className="font-bebas text-3xl text-primary">₹79</div>
                 <div className="text-sm text-muted-foreground">Affordable</div>
               </div>
               <div className="w-px h-12 bg-border"></div>

@@ -83,44 +83,59 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
   };
 
   const signUp = async (email: string, password: string, name: string, whatsapp: string, area: string) => {
-    const redirectUrl = `${window.location.origin}/`;
-    
-    console.log('Signing up user:', email);
-    const { data, error } = await supabase.auth.signUp({
-      email,
-      password,
-      options: {
-        emailRedirectTo: redirectUrl,
-        data: {
-          name,
-          whatsapp_number: whatsapp,
-          area
+    try {
+      const redirectUrl = `${window.location.origin}/`;
+      
+      console.log('Signing up user:', email);
+      const { data, error } = await supabase.auth.signUp({
+        email,
+        password,
+        options: {
+          emailRedirectTo: redirectUrl,
+          data: {
+            name,
+            whatsapp_number: whatsapp,
+            area
+          }
         }
+      });
+      
+      console.log('Signup result:', { data, error });
+      
+      // Check if email confirmation is required
+      if (data?.user && !data?.session && !error) {
+        return { 
+          error: null, 
+          needsConfirmation: true,
+          message: "Please check your email to confirm your account before logging in."
+        };
       }
-    });
-
-    console.log('Signup result:', { data, error });
-    
-    // Check if email confirmation is required
-    if (data?.user && !data?.session && !error) {
+      
+      return { error, needsConfirmation: false };
+    } catch (networkError) {
+      console.error('Network error during signup:', networkError);
       return { 
-        error: null, 
-        needsConfirmation: true,
-        message: "Please check your email to confirm your account before logging in."
+        error: { message: "Network error. Please check your internet connection and try again." }, 
+        needsConfirmation: false 
       };
     }
-    
-    return { error, needsConfirmation: false };
   };
 
   const signIn = async (email: string, password: string) => {
-    console.log('Signing in user:', email);
-    const { data, error } = await supabase.auth.signInWithPassword({
-      email,
-      password
-    });
-    console.log('Signin result:', { data, error });
-    return { error };
+    try {
+      console.log('Signing in user:', email);
+      const { data, error } = await supabase.auth.signInWithPassword({
+        email,
+        password
+      });
+      console.log('Signin result:', { data, error });
+      return { error };
+    } catch (networkError) {
+      console.error('Network error during signin:', networkError);
+      return { 
+        error: { message: "Network error. Please check your internet connection and try again." }
+      };
+    }
   };
 
   const signOut = async () => {

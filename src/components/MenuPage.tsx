@@ -134,8 +134,8 @@ const MenuPage = ({ showAll = false }: MenuPageProps) => {
           </div>
         )}
 
-        <div className={showAll ? "max-w-4xl mx-auto" : "max-w-4xl mx-auto"}>
-          <div className={showAll ? "grid gap-6 md:grid-cols-2 lg:grid-cols-3" : "space-y-6"}>
+        <div className="max-w-6xl mx-auto">
+          <div className={showAll ? "grid gap-6 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4" : "grid gap-6 md:grid-cols-2 lg:grid-cols-3"}>
             {filteredItems.map((burger, index) => (
               <Card key={index} className="border-2 border-border hover:border-primary transition-all duration-300 hover:shadow-brand">
                 <CardContent className="p-6">
@@ -146,23 +146,25 @@ const MenuPage = ({ showAll = false }: MenuPageProps) => {
                       className="w-20 h-20 rounded-lg object-cover"
                     />
                     <div className="flex-1">
-                      <div className="flex justify-between items-start mb-3">
-                        <div className="flex items-center space-x-2 mb-2">
-                          <h3 className="font-bebas text-2xl text-foreground tracking-wide">
-                            {burger.name}
-                          </h3>
-                          {burger.popular && (
-                            <Badge variant="default" className="bg-primary text-primary-foreground">
-                              POPULAR
-                            </Badge>
+                      <div className="flex flex-col gap-2 mb-3">
+                        <div className="flex items-center justify-between w-full">
+                          <div className="flex items-center space-x-2">
+                            <h3 className="font-bebas text-2xl text-foreground tracking-wide">
+                              {burger.name}
+                            </h3>
+                            {burger.popular && (
+                              <Badge variant="default" className="bg-primary text-primary-foreground">
+                                POPULAR
+                              </Badge>
+                            )}
+                          </div>
+                          {!(burger as any).variants && (
+                            <span className="font-bebas text-2xl text-primary">
+                              ₹{burger.price}
+                            </span>
                           )}
                         </div>
-                        {!(burger as any).variants && (
-                          <span className="font-bebas text-2xl text-primary">
-                            ₹{burger.price}
-                          </span>
-                        )}
-                    </div>
+                      </div>
                     </div>
                   </div>
                   <p className="font-montserrat text-muted-foreground leading-relaxed mb-4">

@@ -233,7 +233,7 @@ export default function AuthForm({ onClose }: AuthFormProps) {
                   type="tel"
                   value={formData.whatsapp}
                   onChange={handleInputChange}
-                  placeholder="9970078688"
+                  placeholder="Your WhatsApp number"
                   required
                   pattern="\d{10}"
                   maxLength={10}
@@ -248,7 +248,7 @@ export default function AuthForm({ onClose }: AuthFormProps) {
                   type="text"
                   value={formData.area}
                   onChange={handleInputChange}
-                  placeholder="Urban Forest, Mamurdi"
+                  placeholder="Your location"
                   required
                   minLength={4}
                 />

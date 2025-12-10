@@ -17,28 +17,28 @@ const Hero = () => {
         <div className="absolute inset-0 bg-gradient-to-r from-background/60 to-background/40" aria-hidden="true"></div>
       </div>
 
+      {/* Restaurant Guru Recommended Badge - Floating Position */}
+      <div className="absolute top-4 right-4 md:top-8 md:right-8 z-20">
+        <a 
+          id="b-circledLeaves27" 
+          target="_blank" 
+          rel="noopener noreferrer"
+          href="https://restaurant-guru.in/Burger-Rox-Pimpri-Chinchwad" 
+          className="b-circledLeaves27--light b-circledLeaves27--2025 transform scale-75 md:scale-100"
+          aria-label="Burger Rox recommended by Restaurant Guru 2025"
+        >
+          <span className="b-circledLeaves27__title">Recommended</span>
+          <span className="b-circledLeaves27__separator"></span>
+          <span className="b-circledLeaves27__name">Burger Rox</span>
+        </a>
+      </div>
+
       <div className="container mx-auto px-4 z-10">
         <div className="max-w-4xl mx-auto text-center">
           <div className="space-y-6">
             <h1 className="font-bebas text-7xl md:text-9xl text-foreground leading-none tracking-wider">
               CRAVE-WORTHY BURGERS
             </h1>
-            
-            {/* Restaurant Guru Recommended Badge */}
-            <div className="flex justify-center my-4">
-              <a 
-                id="b-circledLeaves27" 
-                target="_blank" 
-                rel="noopener noreferrer"
-                href="https://restaurant-guru.in/Burger-Rox-Pimpri-Chinchwad" 
-                className="b-circledLeaves27--light b-circledLeaves27--2025"
-                aria-label="Burger Rox recommended by Restaurant Guru 2025"
-              >
-                <span className="b-circledLeaves27__title">Recommended</span>
-                <span className="b-circledLeaves27__separator"></span>
-                <span className="b-circledLeaves27__name">Burger Rox</span>
-              </a>
-            </div>
             
             <p className="font-allura text-3xl md:text-4xl text-foreground mt-4" role="doc-subtitle">
               Rockin' homemade flavor

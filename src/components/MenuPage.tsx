@@ -96,11 +96,8 @@ const MenuPage = ({ showAll = false }: MenuPageProps) => {
     : displayItems.filter(item => item.category === selectedCategory);
 
   const handleAddToCart = async (itemName: string, itemPrice: number) => {
-    console.log('Adding to cart:', itemName, itemPrice, 'User:', user?.id);
     await addToCart(itemName, itemPrice);
   };
-
-  console.log('MenuPage - User authenticated:', !!user);
 
   return (
     <section id="menu" className="py-12 sm:py-20 bg-secondary/30" aria-labelledby="menu-heading">

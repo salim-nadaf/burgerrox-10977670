@@ -3,22 +3,24 @@ import heroImage from "@/assets/hero-burger.jpg";
 
 const Hero = () => {
   return (
-    <section className="relative min-h-[80vh] flex items-center justify-center overflow-hidden" aria-label="Hero section">
-      {/* Background Image */}
-      <div className="absolute inset-0 z-0" role="presentation">
+    <section className="relative min-h-[80vh] flex items-center justify-center overflow-hidden" aria-labelledby="hero-heading">
+      {/* Background Image - Critical LCP element */}
+      <div className="absolute inset-0 z-0" aria-hidden="true">
         <img 
           src={heroImage} 
-          alt="Delicious juicy Burger Rox burger with fresh toppings" 
+          alt="" 
           className="w-full h-full object-cover opacity-50"
           width="1920"
           height="1080"
           loading="eager"
+          fetchPriority="high"
+          decoding="async"
         />
-        <div className="absolute inset-0 bg-gradient-to-r from-background/60 to-background/40" aria-hidden="true"></div>
+        <div className="absolute inset-0 bg-gradient-to-r from-background/60 to-background/40"></div>
       </div>
 
       {/* Restaurant Guru Recommended Badge - Floating Position */}
-      <div className="absolute top-4 right-4 md:top-8 md:right-8 z-20">
+      <aside className="absolute top-4 right-4 md:top-8 md:right-8 z-20" aria-label="Awards">
         <a 
           id="b-circledLeaves27" 
           target="_blank" 
@@ -31,12 +33,12 @@ const Hero = () => {
           <span className="b-circledLeaves27__separator"></span>
           <span className="b-circledLeaves27__name">Burger Rox</span>
         </a>
-      </div>
+      </aside>
 
       <div className="container mx-auto px-4 z-10">
         <div className="max-w-4xl mx-auto text-center">
           <div className="space-y-6">
-            <h1 className="font-bebas text-7xl md:text-9xl text-foreground leading-none tracking-wider">
+            <h1 id="hero-heading" className="font-bebas text-7xl md:text-9xl text-foreground leading-none tracking-wider">
               CRAVE-WORTHY BURGERS
             </h1>
             

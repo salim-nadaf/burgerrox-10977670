@@ -3,7 +3,7 @@ import { Button } from "@/components/ui/button";
 import { Dialog, DialogContent, DialogTrigger, DialogTitle, DialogDescription } from "@/components/ui/dialog";
 import { Sheet, SheetContent, SheetTrigger, SheetHeader, SheetTitle } from "@/components/ui/sheet";
 import { Menu, Phone, MapPin, User, LogOut, X } from "lucide-react";
-import { Link, useLocation } from "react-router-dom";
+import { Link, useLocation, useNavigate } from "react-router-dom";
 import { useAuth } from "@/hooks/useAuth";
 import AuthForm from "./AuthForm";
 import Cart from "./Cart";
@@ -13,6 +13,7 @@ const Header = () => {
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
   const { user, signOut, profile } = useAuth();
   const location = useLocation();
+  const navigate = useNavigate();
 
   const handleSignOut = async () => {
     await signOut();
@@ -192,13 +193,16 @@ const Header = () => {
                       className="font-montserrat font-medium text-foreground hover:text-primary transition-colors py-2 text-left"
                       onClick={() => {
                         setMobileMenuOpen(false);
-                        setTimeout(() => {
-                          if (location.pathname !== '/') {
-                            window.location.href = '/#about';
-                          } else {
+                        if (location.pathname !== '/') {
+                          navigate('/');
+                          setTimeout(() => {
                             document.getElementById('about')?.scrollIntoView({ behavior: 'smooth' });
-                          }
-                        }, 300);
+                          }, 100);
+                        } else {
+                          setTimeout(() => {
+                            document.getElementById('about')?.scrollIntoView({ behavior: 'smooth' });
+                          }, 300);
+                        }
                       }}
                     >
                       About
@@ -207,13 +211,16 @@ const Header = () => {
                       className="font-montserrat font-medium text-foreground hover:text-primary transition-colors py-2 text-left"
                       onClick={() => {
                         setMobileMenuOpen(false);
-                        setTimeout(() => {
-                          if (location.pathname !== '/') {
-                            window.location.href = '/#contact';
-                          } else {
+                        if (location.pathname !== '/') {
+                          navigate('/');
+                          setTimeout(() => {
                             document.getElementById('contact')?.scrollIntoView({ behavior: 'smooth' });
-                          }
-                        }, 300);
+                          }, 100);
+                        } else {
+                          setTimeout(() => {
+                            document.getElementById('contact')?.scrollIntoView({ behavior: 'smooth' });
+                          }, 300);
+                        }
                       }}
                     >
                       Contact

@@ -5,7 +5,7 @@ const About = () => {
     {
       icon: Users,
       title: "Family-First",
-      description: "A brother-sister duo bringing mom's legendary recipes to life. We argue about toppings, but agree on one thing – every burger must be perfect."
+      description: "A sibling duo combining culinary passion with creative hustle. She perfects every patty, he tells the story – together we make it rox."
     },
     {
       icon: DollarSign,
@@ -35,9 +35,9 @@ const About = () => {
             More than just burgers, we're your campus crew
           </p>
           <p className="font-montserrat text-lg text-muted-foreground max-w-3xl mx-auto leading-relaxed">
-            Born from a brother-sister dream and their mom's legendary kitchen recipes. We grew up watching her 
-            create magic with simple ingredients – meals that brought the whole neighborhood together. Now we're 
-            on a mission to bring that same homemade love to your plate, one rockin' burger at a time.
+            What happens when a passionate home cook teams up with her brand-obsessed brother? Burger Rox. 
+            Her burgers had the whole neighborhood asking for more – so we decided to turn that love into something real. 
+            She brings the flavor, he brings the vision, and together we're serving up burgers that just hit different.
           </p>
         </header>
 

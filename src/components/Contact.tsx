@@ -66,9 +66,8 @@ const Contact = () => {
                       CONTACT
                     </h3>
                     <div className="font-montserrat text-muted-foreground space-y-1">
-                      <p>Phone: 9970078688</p>
-                      <p>Orders: 9321389985</p>
-                      <p>WhatsApp Orders Available</p>
+                      <p>Phone: 9321389985 (WhatsApp)</p>
+                      <p>Alternate: 9970078688</p>
                     </div>
                   </div>
                 </div>
@@ -89,7 +88,7 @@ const Contact = () => {
                   variant="brand" 
                   size="lg" 
                   className="w-full"
-                  onClick={() => window.open('https://wa.me/919970078688', '_blank')}
+                  onClick={() => window.open('https://wa.me/919321389985', '_blank')}
                   aria-label="Order on WhatsApp"
                 >
                   Order on WhatsApp
@@ -98,7 +97,7 @@ const Contact = () => {
                   variant="outline" 
                   size="lg" 
                   className="w-full"
-                  onClick={() => window.open('tel:9970078688', '_blank')}
+                  onClick={() => window.open('tel:9321389985', '_blank')}
                   aria-label="Call us to place an order"
                 >
                   Call to Order

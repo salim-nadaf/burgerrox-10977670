@@ -25,7 +25,7 @@ const Footer = () => {
             <div className="font-montserrat text-sm text-accent-foreground space-y-2">
               <p>Urban Forest, Mamurdi</p>
               <p className="font-semibold text-accent-foreground text-base">
-                <a href="tel:+919970078688" aria-label="Call us at 9970078688">9970078688</a>
+                <a href="tel:+919321389985" aria-label="Call us at 9321389985">9321389985</a>
               </p>
               <p>
                 <a href="mailto:cloudspicepvtltd@gmail.com" aria-label="Email us">cloudspicepvtltd@gmail.com</a>

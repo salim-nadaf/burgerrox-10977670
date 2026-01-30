@@ -68,7 +68,7 @@ const Header = () => {
           <div className="hidden lg:flex items-center space-x-4 text-sm font-montserrat">
             <div className="flex items-center space-x-1 text-muted-foreground">
               <Phone size={16} />
-              <span>9970078688</span>
+              <span>9321389985</span>
             </div>
             <div className="flex items-center space-x-1 text-muted-foreground">
               <MapPin size={16} />
@@ -108,7 +108,7 @@ const Header = () => {
                 variant="brand" 
                 size="lg" 
                 className="hidden lg:flex"
-                onClick={() => window.open('https://wa.me/919970078688', '_blank')}
+                onClick={() => window.open('https://wa.me/919321389985', '_blank')}
                 aria-label="Order now on WhatsApp"
               >
                 Order Now
@@ -231,7 +231,7 @@ const Header = () => {
                   <div className="space-y-3 pt-4 border-t">
                     <div className="flex items-center space-x-2 text-muted-foreground">
                       <Phone size={16} />
-                      <span className="font-montserrat text-sm">9970078688</span>
+                      <span className="font-montserrat text-sm">9321389985</span>
                     </div>
                     <div className="flex items-center space-x-2 text-muted-foreground">
                       <MapPin size={16} />
@@ -245,7 +245,7 @@ const Header = () => {
                     size="lg" 
                     className="w-full mt-6"
                     onClick={() => {
-                      window.open('https://wa.me/919970078688', '_blank');
+                      window.open('https://wa.me/919321389985', '_blank');
                       setMobileMenuOpen(false);
                     }}
                     aria-label="Order now on WhatsApp"

@@ -11,8 +11,10 @@ import { ShoppingCart, Minus, Plus, Trash2, CreditCard, Banknote, MessageCircle,
 import { useCart } from '@/hooks/useCart';
 import { useAuth } from '@/hooks/useAuth';
 import { useOrders, OrderItem } from '@/hooks/useOrders';
+import { useDelivery } from '@/hooks/useDelivery';
 import { toast } from '@/components/ui/use-toast';
 import { supabase } from '@/integrations/supabase/client';
+import DeliveryAddressInput from './DeliveryAddressInput';
 
 declare global {
   interface Window {
@@ -26,42 +28,57 @@ interface OrderConfirmation {
   whatsappUrl: string;
   items: OrderItem[];
   totalAmount: number;
+  deliveryCharge: number;
 }
 
 export default function Cart() {
   const { cartItems, removeFromCart, updateQuantity, clearCart, totalAmount, itemCount } = useCart();
   const { user, profile } = useAuth();
   const { createOrder } = useOrders();
+  const { deliveryInfo, clearDelivery } = useDelivery();
   const [isOpen, setIsOpen] = useState(false);
   const [paymentMethod, setPaymentMethod] = useState<'cod' | 'prepaid'>('cod');
   const [isProcessing, setIsProcessing] = useState(false);
   const [orderConfirmation, setOrderConfirmation] = useState<OrderConfirmation | null>(null);
   
+  // Calculate grand total including delivery
+  const deliveryCharge = deliveryInfo?.charge || 0;
+  const grandTotal = totalAmount + deliveryCharge;
+  
   // Store items snapshot before payment
   const itemsSnapshotRef = useRef<OrderItem[]>([]);
   const totalAmountRef = useRef<number>(0);
+  const deliveryChargeRef = useRef<number>(0);
 
   const generateWhatsAppUrl = (
     orderNumber: string, 
     paymentStatus: string, 
     items: OrderItem[], 
-    total: number,
+    subtotal: number,
+    deliveryFee: number,
     customerName: string,
     customerWhatsapp: string,
-    customerArea: string
+    customerArea: string,
+    deliveryAddress: string
   ) => {
     const orderDetails = items.map(item => 
       `${item.item_name} x${item.quantity} - Rs.${(item.item_price * item.quantity).toFixed(2)}`
     ).join('\n');
+
+    const grandTotalAmount = subtotal + deliveryFee;
+    const deliveryLine = deliveryFee === 0 ? 'Delivery: FREE (within 3km)' : `Delivery Charge: Rs.${deliveryFee.toFixed(2)}`;
 
     // Use simple ASCII characters for better WhatsApp encoding compatibility
     const message = `--- BURGER ROX Order ---\n\n` +
       `Order #: ${orderNumber}\n` +
       `Customer: ${customerName}\n` +
       `WhatsApp: ${customerWhatsapp}\n` +
-      `Area: ${customerArea}\n\n` +
+      `Area: ${customerArea}\n` +
+      `Delivery Address: ${deliveryAddress}\n\n` +
       `-- Order Details --\n${orderDetails}\n\n` +
-      `Total Amount: Rs.${total.toFixed(2)}\n` +
+      `Subtotal: Rs.${subtotal.toFixed(2)}\n` +
+      `${deliveryLine}\n` +
+      `TOTAL: Rs.${grandTotalAmount.toFixed(2)}\n` +
       `Payment: ${paymentStatus}\n\n` +
       `DELIVERY REQUIRED - Please confirm delivery time!`;
 
@@ -88,16 +105,19 @@ export default function Cart() {
       item_price: item.item_price,
       quantity: item.quantity
     }));
-    const totalSnapshot = totalAmount;
+    const subtotalSnapshot = totalAmount;
+    const deliverySnapshot = deliveryCharge;
+    const grandTotalSnapshot = grandTotal;
     const customerName = profile?.name || 'Guest Customer';
     const customerWhatsapp = profile?.whatsapp_number || 'Not provided';
     const customerArea = profile?.area || 'Not provided';
+    const deliveryAddress = deliveryInfo?.destinationAddress || customerArea;
     
     try {
-      // Create order in database
+      // Create order in database (store grand total including delivery)
       const order = await createOrder({
         items: itemsSnapshot,
-        totalAmount: totalSnapshot,
+        totalAmount: grandTotalSnapshot,
         paymentMethod: 'cod',
         paymentStatus: 'pending'
       });
@@ -108,10 +128,12 @@ export default function Cart() {
           order.order_number, 
           paymentStatus, 
           itemsSnapshot, 
-          totalSnapshot,
+          subtotalSnapshot,
+          deliverySnapshot,
           customerName,
           customerWhatsapp,
-          customerArea
+          customerArea,
+          deliveryAddress
         );
         
         // Show confirmation dialog with WhatsApp button
@@ -120,10 +142,12 @@ export default function Cart() {
           paymentStatus,
           whatsappUrl,
           items: itemsSnapshot,
-          totalAmount: totalSnapshot
+          totalAmount: subtotalSnapshot,
+          deliveryCharge: deliverySnapshot
         });
         
         clearCart();
+        clearDelivery();
         setIsOpen(false);
         
         toast({
@@ -163,20 +187,24 @@ export default function Cart() {
       item_price: item.item_price,
       quantity: item.quantity
     }));
-    const totalSnapshot = totalAmount;
+    const subtotalSnapshot = totalAmount;
+    const deliverySnapshot = deliveryCharge;
+    const grandTotalSnapshot = grandTotal;
     const customerName = profile?.name || 'Guest Customer';
     const customerWhatsapp = profile?.whatsapp_number || 'Not provided';
     const customerArea = profile?.area || 'Not provided';
+    const deliveryAddress = deliveryInfo?.destinationAddress || customerArea;
 
     // Store in refs for Razorpay callback access
     itemsSnapshotRef.current = itemsSnapshot;
-    totalAmountRef.current = totalSnapshot;
+    totalAmountRef.current = subtotalSnapshot;
+    deliveryChargeRef.current = deliverySnapshot;
 
     try {
-      // Create Razorpay order via edge function
+      // Create Razorpay order via edge function (use grand total including delivery)
       const { data, error } = await supabase.functions.invoke('create-razorpay-order', {
         body: { 
-          amount: totalSnapshot,
+          amount: grandTotalSnapshot,
           receipt: `order_${Date.now()}`
         }
       });
@@ -203,7 +231,9 @@ export default function Cart() {
           // Payment successful - create order in database
           // Use refs to get snapshot data (avoids stale closure)
           const items = itemsSnapshotRef.current;
-          const total = totalAmountRef.current;
+          const subtotal = totalAmountRef.current;
+          const deliveryFee = deliveryChargeRef.current;
+          const total = subtotal + deliveryFee;
           
           const order = await createOrder({
             items,
@@ -219,10 +249,12 @@ export default function Cart() {
               order.order_number, 
               paymentStatus, 
               items, 
-              total,
+              subtotal,
+              deliveryFee,
               customerName,
               customerWhatsapp,
-              customerArea
+              customerArea,
+              deliveryAddress
             );
             
             // Show confirmation dialog with WhatsApp button
@@ -231,10 +263,12 @@ export default function Cart() {
               paymentStatus,
               whatsappUrl,
               items,
-              totalAmount: total
+              totalAmount: subtotal,
+              deliveryCharge: deliveryFee
             });
             
             clearCart();
+            clearDelivery();
             setIsOpen(false);
             
             toast({
@@ -382,9 +416,26 @@ export default function Cart() {
 
               <Separator />
 
-              <div className="flex justify-between items-center text-lg font-semibold">
-                <span>Total Amount:</span>
-                <span>₹{totalAmount.toFixed(2)}</span>
+              {/* Delivery Address Input */}
+              <DeliveryAddressInput />
+
+              {/* Order Summary */}
+              <div className="space-y-2 bg-muted/50 p-3 rounded-lg">
+                <div className="flex justify-between items-center">
+                  <span className="text-muted-foreground">Subtotal:</span>
+                  <span>₹{totalAmount.toFixed(2)}</span>
+                </div>
+                <div className="flex justify-between items-center">
+                  <span className="text-muted-foreground">Delivery:</span>
+                  <span className={deliveryCharge === 0 && deliveryInfo ? 'text-green-600 font-medium' : ''}>
+                    {!deliveryInfo ? 'Enter address above' : deliveryCharge === 0 ? 'FREE' : `₹${deliveryCharge.toFixed(2)}`}
+                  </span>
+                </div>
+                <Separator />
+                <div className="flex justify-between items-center text-lg font-semibold">
+                  <span>Total:</span>
+                  <span>₹{grandTotal.toFixed(2)}</span>
+                </div>
               </div>
 
               <Separator />
@@ -417,13 +468,18 @@ export default function Cart() {
               </div>
 
               <div className="space-y-2 pt-2">
+                {!deliveryInfo && (
+                  <p className="text-sm text-amber-600 text-center">
+                    Please enter delivery address to proceed
+                  </p>
+                )}
                 <Button 
                   onClick={handlePlaceOrder} 
                   className="w-full" 
                   size="lg"
-                  disabled={cartItems.length === 0 || isProcessing}
+                  disabled={cartItems.length === 0 || isProcessing || !deliveryInfo}
                 >
-                  {isProcessing ? 'Processing...' : paymentMethod === 'cod' ? 'Place Order (COD)' : 'Pay & Order'}
+                  {isProcessing ? 'Processing...' : paymentMethod === 'cod' ? `Place Order - ₹${grandTotal.toFixed(2)}` : `Pay ₹${grandTotal.toFixed(2)}`}
                 </Button>
                 
                 <Button 
@@ -466,7 +522,21 @@ export default function Cart() {
                 ))}
               </div>
               <Separator />
-              <p className="font-semibold">Total: ₹{orderConfirmation.totalAmount.toFixed(2)}</p>
+              <div className="flex justify-between text-sm">
+                <span>Subtotal:</span>
+                <span>₹{orderConfirmation.totalAmount.toFixed(2)}</span>
+              </div>
+              <div className="flex justify-between text-sm">
+                <span>Delivery:</span>
+                <span className={orderConfirmation.deliveryCharge === 0 ? 'text-green-600' : ''}>
+                  {orderConfirmation.deliveryCharge === 0 ? 'FREE' : `₹${orderConfirmation.deliveryCharge.toFixed(2)}`}
+                </span>
+              </div>
+              <Separator />
+              <div className="flex justify-between font-semibold">
+                <span>Total:</span>
+                <span>₹{(orderConfirmation.totalAmount + orderConfirmation.deliveryCharge).toFixed(2)}</span>
+              </div>
             </div>
             
             <div className="bg-accent border border-border p-3 rounded-lg">

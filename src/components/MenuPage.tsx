@@ -45,6 +45,7 @@ const allMenuItems = [
   
   // Sides
   { name: "Chicken Nuggets [4 Pcs]", description: "Crispy fried chicken nuggets, perfect for a quick bite.", price: 89, popular: true, category: "Sides" },
+  { name: "Potato Wedges", description: "Crispy golden potato wedges seasoned to perfection.", price: 1, popular: false, category: "Sides" },
   
   // Burgers
   { name: "Burger Rox Zinger", description: "Premium chicken breast fried to perfection with signature sauce and liquid cheese.", price: 259, popular: true, category: "Chicken" },

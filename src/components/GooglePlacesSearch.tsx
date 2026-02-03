@@ -251,22 +251,6 @@ export default function GooglePlacesSearch({
     setShowResults(false);
   };
 
-  if (!isLoaded) {
-    return (
-      <div className="relative w-full">
-        <div className="relative">
-          <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
-          <Input
-            placeholder="Loading Google Maps..."
-            disabled
-            className="pl-9 pr-9 bg-background"
-          />
-          <Loader2 className="absolute right-3 top-1/2 -translate-y-1/2 h-4 w-4 animate-spin text-muted-foreground" />
-        </div>
-      </div>
-    );
-  }
-
   return (
     <div ref={containerRef} className="relative w-full">
       <div className="relative">
@@ -275,7 +259,7 @@ export default function GooglePlacesSearch({
           value={query}
           onChange={(e) => setQuery(e.target.value)}
           onFocus={() => predictions.length > 0 && setShowResults(true)}
-          placeholder={placeholder}
+          placeholder={isLoaded ? placeholder : 'Loading Google Maps… (you can type)'}
           disabled={disabled}
           className="pl-9 pr-9 bg-background"
         />
@@ -289,8 +273,13 @@ export default function GooglePlacesSearch({
             <X className="h-4 w-4" />
           </Button>
         )}
-        {isSearching && (
-          <Loader2 className="absolute right-10 top-1/2 -translate-y-1/2 h-4 w-4 animate-spin text-muted-foreground" />
+        {(isSearching || !isLoaded) && (
+          <Loader2
+            className={cn(
+              "absolute top-1/2 -translate-y-1/2 h-4 w-4 animate-spin text-muted-foreground",
+              query ? "right-10" : "right-3"
+            )}
+          />
         )}
       </div>
 

@@ -5,10 +5,11 @@ const corsHeaders = {
   'Access-Control-Allow-Headers': 'authorization, x-client-info, apikey, content-type',
 };
 
-// Restaurant location - Urban Forest, Mamurdi, Saint Tukaram Nagar Road, Kiwale
-const RESTAURANT_ADDRESS = "Urban Forest, Saint Tukaram Nagar Road, Kiwale, Mamurdi, Taluka Haveli 412101, India";
-const RESTAURANT_LAT = 18.6550;
-const RESTAURANT_LNG = 73.7260;
+// Restaurant location - Urban Forest, Mamurdi, Saint Tukaram Nagar Road, Kiwale, Taluka Haveli 412101
+// Coordinates confirmed from Google Maps
+const RESTAURANT_ADDRESS = "Urban Forest, Mamurdi, Saint Tukaram Nagar Road, Kiwale, Taluka Haveli 412101, India";
+const RESTAURANT_LAT = 18.665812;
+const RESTAURANT_LNG = 73.716100;
 
 // Max delivery distance
 const MAX_DELIVERY_DISTANCE_KM = 12;

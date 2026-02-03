@@ -33,7 +33,8 @@ interface PlacePrediction {
   mainText: string;
   secondaryText: string;
   fullText: string;
-  toPlace: () => google.maps.places.Place;
+  toPlace?: () => google.maps.places.Place;
+  legacyPrediction?: google.maps.places.AutocompletePrediction;
 }
 
 export default function GooglePlacesSearch({ 
@@ -48,26 +49,54 @@ export default function GooglePlacesSearch({
   const [showResults, setShowResults] = useState(false);
   const [isLoaded, setIsLoaded] = useState(false);
   const [placesLibrary, setPlacesLibrary] = useState<google.maps.PlacesLibrary | null>(null);
+  const [useNewAutocompleteApi, setUseNewAutocompleteApi] = useState(false);
   const containerRef = useRef<HTMLDivElement>(null);
   const sessionTokenRef = useRef<google.maps.places.AutocompleteSessionToken | null>(null);
   const debounceRef = useRef<NodeJS.Timeout>();
+  const legacyAutocompleteRef = useRef<google.maps.places.AutocompleteService | null>(null);
+  const legacyPlacesServiceRef = useRef<google.maps.places.PlacesService | null>(null);
+  const legacyServiceElRef = useRef<HTMLDivElement | null>(null);
 
   // Load Google Maps script
   useEffect(() => {
     console.log('[GooglePlaces] Checking for Google Maps API...');
     
+    const ensureLegacyServices = () => {
+      try {
+        if (!window.google?.maps?.places) return;
+        legacyAutocompleteRef.current = new window.google.maps.places.AutocompleteService();
+        if (!legacyServiceElRef.current) {
+          legacyServiceElRef.current = document.createElement('div');
+        }
+        legacyPlacesServiceRef.current = new window.google.maps.places.PlacesService(legacyServiceElRef.current);
+      } catch (e) {
+        console.error('[GooglePlaces] Failed to init legacy services:', e);
+      }
+    };
+
     const loadLibrary = async () => {
       try {
+        // Mark loaded as soon as base maps JS is ready (so input isn't blocked)
+        if (window.google?.maps) {
+          setIsLoaded(true);
+        }
+
+        // Prefer new API when available
         if (window.google?.maps?.importLibrary) {
           console.log('[GooglePlaces] Loading places library via importLibrary...');
           const lib = await window.google.maps.importLibrary('places') as google.maps.PlacesLibrary;
           setPlacesLibrary(lib);
-          setIsLoaded(true);
+          setUseNewAutocompleteApi(!!(lib as any)?.AutocompleteSuggestion);
           console.log('[GooglePlaces] Places library loaded successfully');
+          ensureLegacyServices();
           return;
         }
+
+        // Fallback: legacy global namespace
+        ensureLegacyServices();
       } catch (e) {
         console.error('[GooglePlaces] Error loading places library:', e);
+        ensureLegacyServices();
       }
     };
 
@@ -87,7 +116,7 @@ export default function GooglePlacesSearch({
     const script = document.createElement('script');
     script.id = GOOGLE_MAPS_SCRIPT_ID;
     // Use the new loading pattern with loading=async for better performance
-    script.src = `https://maps.googleapis.com/maps/api/js?key=${apiKey}&libraries=places&loading=async`;
+    script.src = `https://maps.googleapis.com/maps/api/js?key=${apiKey}&libraries=places&loading=async&v=weekly&region=IN&language=en`;
     script.async = true;
     script.defer = true;
     script.onload = loadLibrary;
@@ -101,9 +130,16 @@ export default function GooglePlacesSearch({
 
   // Create session token when library is loaded
   useEffect(() => {
-    if (placesLibrary) {
-      sessionTokenRef.current = new placesLibrary.AutocompleteSessionToken();
-      console.log('[GooglePlaces] Session token created');
+    if (!isLoaded) return;
+
+    try {
+      const TokenCtor = placesLibrary?.AutocompleteSessionToken || window.google?.maps?.places?.AutocompleteSessionToken;
+      if (TokenCtor) {
+        sessionTokenRef.current = new TokenCtor();
+        console.log('[GooglePlaces] Session token created');
+      }
+    } catch (e) {
+      console.error('[GooglePlaces] Failed to create session token:', e);
     }
   }, [placesLibrary]);
 
@@ -122,61 +158,109 @@ export default function GooglePlacesSearch({
   const searchPlaces = useCallback(async (input: string) => {
     console.log('[GooglePlaces] searchPlaces called with:', input);
     console.log('[GooglePlaces] placesLibrary exists:', !!placesLibrary);
+    console.log('[GooglePlaces] useNewAutocompleteApi:', useNewAutocompleteApi);
     
-    if (!placesLibrary || input.length < 3) {
-      console.log('[GooglePlaces] Skipping search - library not ready or input too short');
+    if (input.length < 3) {
+      setPredictions([]);
+      setShowResults(false);
+      return;
+    }
+
+    if (!isLoaded) {
+      console.log('[GooglePlaces] Skipping search - maps not loaded yet');
       setPredictions([]);
       setShowResults(false);
       return;
     }
 
     setIsSearching(true);
-    console.log('[GooglePlaces] Calling fetchAutocompleteSuggestions (new API)...');
     
     try {
-      const request: google.maps.places.AutocompleteRequest = {
+      // 1) New API path
+      if (useNewAutocompleteApi && placesLibrary?.AutocompleteSuggestion) {
+        console.log('[GooglePlaces] Calling fetchAutocompleteSuggestions (new API)...');
+
+        const request: google.maps.places.AutocompleteRequest = {
+          input,
+          includedRegionCodes: ['in'],
+          locationBias: {
+            center: { lat: 18.5204, lng: 73.8567 },
+            radius: 50000,
+          },
+          language: 'en-IN',
+        };
+
+        if (sessionTokenRef.current) {
+          (request as any).sessionToken = sessionTokenRef.current;
+        }
+
+        const { suggestions } = await placesLibrary.AutocompleteSuggestion.fetchAutocompleteSuggestions(request);
+        console.log('[GooglePlaces] Autocomplete response - suggestions:', suggestions?.length || 0);
+
+        if (suggestions && suggestions.length > 0) {
+          const formattedPredictions: PlacePrediction[] = suggestions
+            .filter(s => s.placePrediction)
+            .map(s => {
+              const prediction = s.placePrediction!;
+              const text = prediction.text;
+              const mainText = prediction.mainText;
+              const secondaryText = prediction.secondaryText;
+
+              return {
+                placeId: prediction.placeId,
+                mainText: mainText?.text || text?.text?.split(',')[0] || '',
+                secondaryText: secondaryText?.text || text?.text || '',
+                fullText: text?.text || '',
+                toPlace: () => prediction.toPlace(),
+              };
+            });
+
+          setPredictions(formattedPredictions);
+          setShowResults(true);
+          return;
+        }
+
+        setPredictions([]);
+        setShowResults(true);
+        return;
+      }
+
+      // 2) Legacy fallback path
+      console.log('[GooglePlaces] Falling back to legacy AutocompleteService...');
+      const svc = legacyAutocompleteRef.current;
+      if (!svc) {
+        console.warn('[GooglePlaces] Legacy autocomplete service not ready');
+        setPredictions([]);
+        setShowResults(false);
+        return;
+      }
+
+      const legacyRequest: google.maps.places.AutocompletionRequest = {
         input,
-        includedRegionCodes: ['in'], // India only
-        locationBias: {
-          center: { lat: 18.5204, lng: 73.8567 }, // Pune center
-          radius: 50000 // 50km radius
-        },
-        language: 'en-IN',
+        componentRestrictions: { country: 'in' },
+        // Bias around Pune
+        location: new window.google!.maps.LatLng(18.5204, 73.8567),
+        radius: 50000,
       };
 
-      // Add session token if available
       if (sessionTokenRef.current) {
-        (request as any).sessionToken = sessionTokenRef.current;
+        legacyRequest.sessionToken = sessionTokenRef.current;
       }
 
-      const { suggestions } = await placesLibrary.AutocompleteSuggestion.fetchAutocompleteSuggestions(request);
-      
-      console.log('[GooglePlaces] Autocomplete response - suggestions:', suggestions?.length || 0);
-      
-      if (suggestions && suggestions.length > 0) {
-        const formattedPredictions: PlacePrediction[] = suggestions
-          .filter(s => s.placePrediction)
-          .map(s => {
-            const prediction = s.placePrediction!;
-            const text = prediction.text;
-            const mainText = prediction.mainText;
-            const secondaryText = prediction.secondaryText;
-            
-            return {
-              placeId: prediction.placeId,
-              mainText: mainText?.text || text?.text?.split(',')[0] || '',
-              secondaryText: secondaryText?.text || text?.text || '',
-              fullText: text?.text || '',
-              toPlace: () => prediction.toPlace()
-            };
-          });
-        
-        setPredictions(formattedPredictions);
-        setShowResults(true);
-      } else {
-        setPredictions([]);
-        setShowResults(true); // Show "no results" message
-      }
+      const legacyPredictions = await new Promise<google.maps.places.AutocompletePrediction[]>((resolve) => {
+        svc.getPlacePredictions(legacyRequest, (preds) => resolve(preds || []));
+      });
+
+      const formatted: PlacePrediction[] = legacyPredictions.map((p) => ({
+        placeId: p.place_id,
+        mainText: p.structured_formatting?.main_text || p.description.split(',')[0] || p.description,
+        secondaryText: p.structured_formatting?.secondary_text || p.description,
+        fullText: p.description,
+        legacyPrediction: p,
+      }));
+
+      setPredictions(formatted);
+      setShowResults(true);
     } catch (error: any) {
       console.error('[GooglePlaces] Autocomplete error:', error);
       setPredictions([]);
@@ -184,7 +268,7 @@ export default function GooglePlacesSearch({
     } finally {
       setIsSearching(false);
     }
-  }, [placesLibrary]);
+  }, [placesLibrary, isLoaded, useNewAutocompleteApi]);
 
   useEffect(() => {
     if (debounceRef.current) {
@@ -209,41 +293,81 @@ export default function GooglePlacesSearch({
   }, [query, searchPlaces]);
 
   const handleSelect = useCallback(async (prediction: PlacePrediction) => {
-    if (!placesLibrary) return;
-
     try {
       console.log('[GooglePlaces] Fetching place details for:', prediction.placeId);
-      
-      const place = prediction.toPlace();
-      await place.fetchFields({
-        fields: ['displayName', 'formattedAddress', 'location', 'id']
-      });
 
-      const location = place.location;
-      if (location) {
-        const lat = location.lat();
-        const lng = location.lng();
-        
-        onPlaceSelect({
-          placeId: place.id || prediction.placeId,
-          formattedAddress: place.formattedAddress || prediction.fullText,
-          shortAddress: place.displayName || prediction.mainText,
-          lat,
-          lng
+      // New API path
+      if (useNewAutocompleteApi && prediction.toPlace) {
+        const place = prediction.toPlace();
+        await place.fetchFields({
+          fields: ['displayName', 'formattedAddress', 'location', 'id']
         });
-        
-        setQuery(place.displayName || prediction.mainText);
-        setShowResults(false);
-        setPredictions([]);
-        
-        // Create a new session token for the next search
-        sessionTokenRef.current = new placesLibrary.AutocompleteSessionToken();
-        console.log('[GooglePlaces] Place selected, new session token created');
+
+        const location = place.location;
+        if (location) {
+          const lat = location.lat();
+          const lng = location.lng();
+
+          onPlaceSelect({
+            placeId: place.id || prediction.placeId,
+            formattedAddress: place.formattedAddress || prediction.fullText,
+            shortAddress: place.displayName || prediction.mainText,
+            lat,
+            lng
+          });
+
+          setQuery(place.displayName || prediction.mainText);
+        }
+      } else {
+        // Legacy fallback path
+        const svc = legacyPlacesServiceRef.current;
+        if (!svc) throw new Error('Legacy PlacesService not ready');
+
+        const place = await new Promise<google.maps.places.PlaceResult>((resolve, reject) => {
+          svc.getDetails(
+            {
+              placeId: prediction.placeId,
+              fields: ['place_id', 'name', 'formatted_address', 'geometry'],
+              sessionToken: sessionTokenRef.current || undefined,
+            },
+            (result, status) => {
+              if (status === window.google!.maps.places.PlacesServiceStatus.OK && result) resolve(result);
+              else reject(new Error(status));
+            }
+          );
+        });
+
+        const loc = place.geometry?.location;
+        if (loc) {
+          onPlaceSelect({
+            placeId: place.place_id || prediction.placeId,
+            formattedAddress: place.formatted_address || prediction.fullText,
+            shortAddress: place.name || prediction.mainText,
+            lat: loc.lat(),
+            lng: loc.lng(),
+          });
+
+          setQuery(place.name || prediction.mainText);
+        }
+      }
+
+      setShowResults(false);
+      setPredictions([]);
+
+      // Create a new session token for the next search
+      try {
+        const TokenCtor = placesLibrary?.AutocompleteSessionToken || window.google?.maps?.places?.AutocompleteSessionToken;
+        if (TokenCtor) {
+          sessionTokenRef.current = new TokenCtor();
+          console.log('[GooglePlaces] Place selected, new session token created');
+        }
+      } catch {
+        // ignore
       }
     } catch (error) {
       console.error('[GooglePlaces] Error fetching place details:', error);
     }
-  }, [placesLibrary, onPlaceSelect]);
+  }, [onPlaceSelect, placesLibrary, useNewAutocompleteApi]);
 
   const clearSearch = () => {
     setQuery('');

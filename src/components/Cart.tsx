@@ -15,6 +15,8 @@ import { useDelivery } from '@/hooks/useDelivery';
 import { toast } from '@/components/ui/use-toast';
 import { supabase } from '@/integrations/supabase/client';
 import DeliveryAddressInput from './DeliveryAddressInput';
+import OrderTypeSelector, { OrderType, RESTAURANT_ADDRESS } from './OrderTypeSelector';
+import { DetailedAddress, isAddressComplete, formatFullAddress } from './DetailedAddressForm';
 
 declare global {
   interface Window {
@@ -29,6 +31,7 @@ interface OrderConfirmation {
   items: OrderItem[];
   totalAmount: number;
   deliveryCharge: number;
+  orderType: OrderType;
 }
 
 export default function Cart() {
@@ -40,15 +43,39 @@ export default function Cart() {
   const [paymentMethod, setPaymentMethod] = useState<'cod' | 'prepaid'>('cod');
   const [isProcessing, setIsProcessing] = useState(false);
   const [orderConfirmation, setOrderConfirmation] = useState<OrderConfirmation | null>(null);
+  const [orderType, setOrderType] = useState<OrderType>('delivery');
+  const [detailedAddress, setDetailedAddress] = useState<DetailedAddress>({
+    flatNo: '',
+    building: '',
+    area: '',
+    pincode: ''
+  });
   
-  // Calculate grand total including delivery
-  const deliveryCharge = deliveryInfo?.charge || 0;
+  // Calculate grand total including delivery (no charge for pickup)
+  const deliveryCharge = orderType === 'pickup' ? 0 : (deliveryInfo?.charge || 0);
   const grandTotal = totalAmount + deliveryCharge;
   
   // Store items snapshot before payment
   const itemsSnapshotRef = useRef<OrderItem[]>([]);
   const totalAmountRef = useRef<number>(0);
   const deliveryChargeRef = useRef<number>(0);
+
+  // Check if order can be placed
+  const canPlaceOrder = () => {
+    if (cartItems.length === 0) return false;
+    
+    if (orderType === 'pickup') {
+      return true; // Pickup just needs items
+    }
+    
+    // Delivery needs location + detailed address
+    return deliveryInfo && isAddressComplete(detailedAddress);
+  };
+
+  // Generate Google Maps pin link
+  const getGoogleMapsLink = (lat: number, lng: number) => {
+    return `https://www.google.com/maps?q=${lat},${lng}`;
+  };
 
   const generateWhatsAppUrl = (
     orderNumber: string, 
@@ -58,29 +85,51 @@ export default function Cart() {
     deliveryFee: number,
     customerName: string,
     customerWhatsapp: string,
-    customerArea: string,
-    deliveryAddress: string
+    isPickup: boolean,
+    fullAddress: string,
+    mapsLink: string | null
   ) => {
     const orderDetails = items.map(item => 
       `${item.item_name} x${item.quantity} - Rs.${(item.item_price * item.quantity).toFixed(2)}`
     ).join('\n');
 
     const grandTotalAmount = subtotal + deliveryFee;
-    const deliveryLine = deliveryFee === 0 ? 'Delivery: FREE (within 3km)' : `Delivery Charge: Rs.${deliveryFee.toFixed(2)}`;
-
-    // Use simple ASCII characters for better WhatsApp encoding compatibility
-    const message = `--- BURGER ROX Order ---\n\n` +
-      `Order #: ${orderNumber}\n` +
-      `Customer: ${customerName}\n` +
-      `WhatsApp: ${customerWhatsapp}\n` +
-      `Area: ${customerArea}\n` +
-      `Delivery Address: ${deliveryAddress}\n\n` +
-      `-- Order Details --\n${orderDetails}\n\n` +
-      `Subtotal: Rs.${subtotal.toFixed(2)}\n` +
-      `${deliveryLine}\n` +
-      `TOTAL: Rs.${grandTotalAmount.toFixed(2)}\n` +
-      `Payment: ${paymentStatus}\n\n` +
-      `DELIVERY REQUIRED - Please confirm delivery time!`;
+    
+    let message: string;
+    
+    if (isPickup) {
+      // Pickup order - show restaurant address for pickup
+      message = `--- BURGER ROX Order ---\n\n` +
+        `Order #: ${orderNumber}\n` +
+        `Order Type: PICKUP\n` +
+        `Customer: ${customerName}\n` +
+        `WhatsApp: ${customerWhatsapp}\n\n` +
+        `-- Order Details --\n${orderDetails}\n\n` +
+        `TOTAL: Rs.${grandTotalAmount.toFixed(2)}\n` +
+        `Payment: ${paymentStatus}\n\n` +
+        `PICKUP LOCATION:\n${RESTAURANT_ADDRESS}\n\n` +
+        `Please confirm ready time!`;
+    } else {
+      // Delivery order - show Google Maps pin + minimal address
+      const deliverySection = mapsLink 
+        ? `DELIVERY LOCATION:\n${mapsLink}\n\nAddress: ${fullAddress}`
+        : `DELIVERY ADDRESS:\n${fullAddress}`;
+      
+      const deliveryLine = deliveryFee === 0 ? 'Delivery: FREE (within 3km)' : `Delivery Charge: Rs.${deliveryFee.toFixed(2)}`;
+      
+      message = `--- BURGER ROX Order ---\n\n` +
+        `Order #: ${orderNumber}\n` +
+        `Order Type: DELIVERY\n` +
+        `Customer: ${customerName}\n` +
+        `WhatsApp: ${customerWhatsapp}\n\n` +
+        `-- Order Details --\n${orderDetails}\n\n` +
+        `Subtotal: Rs.${subtotal.toFixed(2)}\n` +
+        `${deliveryLine}\n` +
+        `TOTAL: Rs.${grandTotalAmount.toFixed(2)}\n` +
+        `Payment: ${paymentStatus}\n\n` +
+        `${deliverySection}\n\n` +
+        `Please confirm delivery time!`;
+    }
 
     const encodedMessage = encodeURIComponent(message);
     return `https://wa.me/919321389985?text=${encodedMessage}`;
@@ -110,8 +159,14 @@ export default function Cart() {
     const grandTotalSnapshot = grandTotal;
     const customerName = profile?.name || 'Guest Customer';
     const customerWhatsapp = profile?.whatsapp_number || 'Not provided';
-    const customerArea = profile?.area || 'Not provided';
-    const deliveryAddress = deliveryInfo?.destinationAddress || customerArea;
+    
+    const isPickup = orderType === 'pickup';
+    const fullAddress = isPickup 
+      ? RESTAURANT_ADDRESS 
+      : formatFullAddress(detailedAddress, deliveryInfo?.destinationAddress);
+    const mapsLink = (!isPickup && deliveryInfo?.lat && deliveryInfo?.lng) 
+      ? getGoogleMapsLink(deliveryInfo.lat, deliveryInfo.lng) 
+      : null;
     
     try {
       // Create order in database (store grand total including delivery)
@@ -132,8 +187,9 @@ export default function Cart() {
           deliverySnapshot,
           customerName,
           customerWhatsapp,
-          customerArea,
-          deliveryAddress
+          isPickup,
+          fullAddress,
+          mapsLink
         );
         
         // Show confirmation dialog with WhatsApp button
@@ -143,12 +199,14 @@ export default function Cart() {
           whatsappUrl,
           items: itemsSnapshot,
           totalAmount: subtotalSnapshot,
-          deliveryCharge: deliverySnapshot
+          deliveryCharge: deliverySnapshot,
+          orderType
         });
         
         clearCart();
-        clearDelivery();
+        if (!isPickup) clearDelivery();
         setIsOpen(false);
+        setDetailedAddress({ flatNo: '', building: '', area: '', pincode: '' });
         
         toast({
           title: "Order Placed!",
@@ -192,8 +250,14 @@ export default function Cart() {
     const grandTotalSnapshot = grandTotal;
     const customerName = profile?.name || 'Guest Customer';
     const customerWhatsapp = profile?.whatsapp_number || 'Not provided';
-    const customerArea = profile?.area || 'Not provided';
-    const deliveryAddress = deliveryInfo?.destinationAddress || customerArea;
+    
+    const isPickup = orderType === 'pickup';
+    const fullAddress = isPickup 
+      ? RESTAURANT_ADDRESS 
+      : formatFullAddress(detailedAddress, deliveryInfo?.destinationAddress);
+    const mapsLink = (!isPickup && deliveryInfo?.lat && deliveryInfo?.lng) 
+      ? getGoogleMapsLink(deliveryInfo.lat, deliveryInfo.lng) 
+      : null;
 
     // Store in refs for Razorpay callback access
     itemsSnapshotRef.current = itemsSnapshot;
@@ -253,8 +317,9 @@ export default function Cart() {
               deliveryFee,
               customerName,
               customerWhatsapp,
-              customerArea,
-              deliveryAddress
+              isPickup,
+              fullAddress,
+              mapsLink
             );
             
             // Show confirmation dialog with WhatsApp button
@@ -264,12 +329,14 @@ export default function Cart() {
               whatsappUrl,
               items,
               totalAmount: subtotal,
-              deliveryCharge: deliveryFee
+              deliveryCharge: deliveryFee,
+              orderType
             });
             
             clearCart();
-            clearDelivery();
+            if (!isPickup) clearDelivery();
             setIsOpen(false);
+            setDetailedAddress({ flatNo: '', building: '', area: '', pincode: '' });
             
             toast({
               title: "Payment Successful!",
@@ -331,13 +398,21 @@ export default function Cart() {
   };
 
   const handlePlaceOrder = () => {
-    if (cartItems.length === 0) return;
+    if (!canPlaceOrder()) return;
 
     if (paymentMethod === 'cod') {
       handleCODOrder();
     } else {
       handlePrepaidOrder();
     }
+  };
+
+  // Get validation message
+  const getValidationMessage = () => {
+    if (orderType === 'pickup') return null;
+    if (!deliveryInfo) return 'Please enter delivery location';
+    if (!isAddressComplete(detailedAddress)) return 'Please fill all address fields';
+    return null;
   };
 
   if (!user) {
@@ -437,8 +512,16 @@ export default function Cart() {
 
               <Separator />
 
-              {/* Delivery Address Input */}
-              <DeliveryAddressInput />
+              {/* Order Type Selection - Pickup or Delivery */}
+              <OrderTypeSelector value={orderType} onChange={setOrderType} />
+
+              {/* Delivery Address Input (only for delivery) */}
+              {orderType === 'delivery' && (
+                <DeliveryAddressInput 
+                  detailedAddress={detailedAddress}
+                  onDetailedAddressChange={setDetailedAddress}
+                />
+              )}
 
               {/* Order Summary */}
               <div className="space-y-2 bg-muted/50 p-3 rounded-lg">
@@ -446,12 +529,20 @@ export default function Cart() {
                   <span className="text-muted-foreground">Subtotal:</span>
                   <span>₹{totalAmount.toFixed(2)}</span>
                 </div>
-                <div className="flex justify-between items-center">
-                  <span className="text-muted-foreground">Delivery:</span>
-                  <span className={deliveryCharge === 0 && deliveryInfo ? 'text-green-600 font-medium' : ''}>
-                    {!deliveryInfo ? 'Enter address above' : deliveryCharge === 0 ? 'FREE' : `₹${deliveryCharge.toFixed(2)}`}
-                  </span>
-                </div>
+                {orderType === 'delivery' && (
+                  <div className="flex justify-between items-center">
+                    <span className="text-muted-foreground">Delivery:</span>
+                    <span className={deliveryCharge === 0 && deliveryInfo ? 'text-primary font-medium' : ''}>
+                      {!deliveryInfo ? 'Enter address above' : deliveryCharge === 0 ? 'FREE' : `₹${deliveryCharge.toFixed(2)}`}
+                    </span>
+                  </div>
+                )}
+                {orderType === 'pickup' && (
+                  <div className="flex justify-between items-center">
+                    <span className="text-muted-foreground">Pickup:</span>
+                    <span className="text-primary font-medium">No charge</span>
+                  </div>
+                )}
                 <Separator />
                 <div className="flex justify-between items-center text-lg font-semibold">
                   <span>Total:</span>
@@ -489,16 +580,16 @@ export default function Cart() {
               </div>
 
               <div className="space-y-2 pt-2">
-                {!deliveryInfo && (
+                {getValidationMessage() && (
                   <p className="text-sm text-amber-600 text-center">
-                    Please enter delivery address to proceed
+                    {getValidationMessage()}
                   </p>
                 )}
                 <Button 
                   onClick={handlePlaceOrder} 
                   className="w-full" 
                   size="lg"
-                  disabled={cartItems.length === 0 || isProcessing || !deliveryInfo}
+                  disabled={!canPlaceOrder() || isProcessing}
                 >
                   {isProcessing ? 'Processing...' : paymentMethod === 'cod' ? `Place Order - ₹${grandTotal.toFixed(2)}` : `Pay ₹${grandTotal.toFixed(2)}`}
                 </Button>
@@ -534,7 +625,12 @@ export default function Cart() {
         {orderConfirmation && (
           <div className="space-y-4">
             <div className="bg-muted p-4 rounded-lg space-y-2">
-              <p className="font-semibold">Order #{orderConfirmation.orderNumber}</p>
+              <div className="flex justify-between items-center">
+                <p className="font-semibold">Order #{orderConfirmation.orderNumber}</p>
+                <Badge variant={orderConfirmation.orderType === 'pickup' ? 'secondary' : 'default'}>
+                  {orderConfirmation.orderType === 'pickup' ? 'Pickup' : 'Delivery'}
+                </Badge>
+              </div>
               <div className="text-sm space-y-1">
                 {orderConfirmation.items.map((item, idx) => (
                   <p key={idx}>
@@ -547,12 +643,14 @@ export default function Cart() {
                 <span>Subtotal:</span>
                 <span>₹{orderConfirmation.totalAmount.toFixed(2)}</span>
               </div>
-              <div className="flex justify-between text-sm">
-                <span>Delivery:</span>
-                <span className={orderConfirmation.deliveryCharge === 0 ? 'text-green-600' : ''}>
-                  {orderConfirmation.deliveryCharge === 0 ? 'FREE' : `₹${orderConfirmation.deliveryCharge.toFixed(2)}`}
-                </span>
-              </div>
+              {orderConfirmation.orderType === 'delivery' && (
+                <div className="flex justify-between text-sm">
+                  <span>Delivery:</span>
+                  <span className={orderConfirmation.deliveryCharge === 0 ? 'text-primary' : ''}>
+                    {orderConfirmation.deliveryCharge === 0 ? 'FREE' : `₹${orderConfirmation.deliveryCharge.toFixed(2)}`}
+                  </span>
+                </div>
+              )}
               <Separator />
               <div className="flex justify-between font-semibold">
                 <span>Total:</span>
@@ -562,7 +660,7 @@ export default function Cart() {
             
             <div className="bg-accent border border-border p-3 rounded-lg">
               <p className="text-sm text-foreground">
-                ⚠️ <strong>Important:</strong> Click the button below to send your order via WhatsApp. 
+                <strong>Important:</strong> Click the button below to send your order via WhatsApp. 
                 Without this, the restaurant won't receive your order!
               </p>
             </div>

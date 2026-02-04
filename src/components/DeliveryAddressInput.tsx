@@ -2,10 +2,11 @@ import { useState } from 'react';
 import { Button } from '@/components/ui/button';
 import { Label } from '@/components/ui/label';
 import { Card, CardContent } from '@/components/ui/card';
-import { MapPin, Loader2, Truck, CheckCircle, Navigation, AlertTriangle, Leaf } from 'lucide-react';
+import { MapPin, Loader2, Truck, CheckCircle, Navigation, AlertTriangle, Leaf, ExternalLink } from 'lucide-react';
 import { useDelivery } from '@/hooks/useDelivery';
 import { toast } from '@/components/ui/use-toast';
 import GooglePlacesSearch from './GooglePlacesSearch';
+import DetailedAddressForm, { DetailedAddress, isAddressComplete, formatFullAddress } from './DetailedAddressForm';
 
 // Google Maps API Key (publishable - restricted by HTTP referrer in Google Console)
 const GOOGLE_MAPS_API_KEY = 'AIzaSyCsYwmjFxC5JrZtZKB8EhzBF2hF61K1xVs';
@@ -14,7 +15,15 @@ const GOOGLE_MAPS_API_KEY = 'AIzaSyCsYwmjFxC5JrZtZKB8EhzBF2hF61K1xVs';
 const MAX_DELIVERY_DISTANCE_KM = 12;
 const FRESHNESS_MESSAGE_THRESHOLD_KM = 6;
 
-export default function DeliveryAddressInput() {
+interface DeliveryAddressInputProps {
+  detailedAddress: DetailedAddress;
+  onDetailedAddressChange: (address: DetailedAddress) => void;
+}
+
+export default function DeliveryAddressInput({ 
+  detailedAddress, 
+  onDetailedAddressChange 
+}: DeliveryAddressInputProps) {
   const { deliveryInfo, isCalculating, calculateDeliveryFromPlace, calculateDeliveryFromCoords, clearDelivery } = useDelivery();
   const [isGettingLocation, setIsGettingLocation] = useState(false);
   const [tooFarError, setTooFarError] = useState<string | null>(null);
@@ -114,6 +123,14 @@ export default function DeliveryAddressInput() {
     setTooFarError(null);
   };
 
+  // Generate Google Maps link for the delivery location
+  const getMapsLink = () => {
+    if (deliveryInfo?.lat && deliveryInfo?.lng) {
+      return `https://www.google.com/maps?q=${deliveryInfo.lat},${deliveryInfo.lng}`;
+    }
+    return null;
+  };
+
   // Show "too far" error state
   if (tooFarError) {
     return (
@@ -140,63 +157,85 @@ export default function DeliveryAddressInput() {
     );
   }
 
-  // Show delivery info if already set
+  // Show delivery info if location is set
   if (deliveryInfo) {
     const isLongDistance = deliveryInfo.distanceKm >= FRESHNESS_MESSAGE_THRESHOLD_KM;
+    const mapsLink = getMapsLink();
     
     return (
-      <Card className="border-primary/30 bg-primary/5">
-        <CardContent className="p-4 space-y-2">
-          <div className="flex items-center justify-between">
-            <div className="flex items-center gap-2 text-primary">
-              <CheckCircle className="h-5 w-5" />
-              <span className="font-semibold">Delivery Location Set</span>
+      <div className="space-y-3">
+        <Card className="border-primary/30 bg-primary/5">
+          <CardContent className="p-4 space-y-2">
+            <div className="flex items-center justify-between">
+              <div className="flex items-center gap-2 text-primary">
+                <CheckCircle className="h-5 w-5" />
+                <span className="font-semibold">Location Confirmed</span>
+              </div>
+              <Button variant="ghost" size="sm" onClick={handleClear}>
+                Change
+              </Button>
             </div>
-            <Button variant="ghost" size="sm" onClick={handleClear}>
-              Change
-            </Button>
-          </div>
-          
-          <p className="text-sm text-muted-foreground line-clamp-3">
-            {deliveryInfo.destinationAddress}
-          </p>
-          
-          <div className="flex items-center justify-between pt-2 border-t">
-            <div className="flex items-center gap-2 text-sm">
-              <MapPin className="h-4 w-4 text-muted-foreground" />
-              <span>{deliveryInfo.distanceText}</span>
-              <span className="text-muted-foreground">•</span>
-              <span>{deliveryInfo.durationText}</span>
-            </div>
-          </div>
-          
-          <div className="flex items-center justify-between bg-background rounded-lg p-3">
-            <div className="flex items-center gap-2">
-              <Truck className="h-5 w-5 text-primary" />
-              <span className="font-medium">Delivery Charge</span>
-            </div>
-            <span className={`font-bold text-lg ${deliveryInfo.charge === 0 ? 'text-primary' : ''}`}>
-              {deliveryInfo.charge === 0 ? 'FREE' : `₹${deliveryInfo.charge}`}
-            </span>
-          </div>
-          
-          {deliveryInfo.charge === 0 && (
-            <p className="text-xs text-primary text-center">
-              You're within 3km - Free delivery zone!
+            
+            <p className="text-sm text-muted-foreground line-clamp-2">
+              {deliveryInfo.destinationAddress}
             </p>
-          )}
-          
-          {/* Freshness guaranteed message for long distances */}
-          {isLongDistance && (
-            <div className="flex items-center gap-2 p-2 bg-accent rounded-lg border border-border">
-              <Leaf className="h-4 w-4 text-primary" />
-              <p className="text-xs text-foreground">
-                🍔 Freshness Guaranteed! Your order will be packed with care for optimal quality.
-              </p>
+            
+            {mapsLink && (
+              <a 
+                href={mapsLink} 
+                target="_blank" 
+                rel="noopener noreferrer"
+                className="text-xs text-primary flex items-center gap-1 hover:underline"
+              >
+                <ExternalLink className="h-3 w-3" />
+                View on Google Maps
+              </a>
+            )}
+            
+            <div className="flex items-center justify-between pt-2 border-t">
+              <div className="flex items-center gap-2 text-sm">
+                <MapPin className="h-4 w-4 text-muted-foreground" />
+                <span>{deliveryInfo.distanceText}</span>
+                <span className="text-muted-foreground">•</span>
+                <span>{deliveryInfo.durationText}</span>
+              </div>
             </div>
-          )}
-        </CardContent>
-      </Card>
+            
+            <div className="flex items-center justify-between bg-background rounded-lg p-3">
+              <div className="flex items-center gap-2">
+                <Truck className="h-5 w-5 text-primary" />
+                <span className="font-medium">Delivery Charge</span>
+              </div>
+              <span className={`font-bold text-lg ${deliveryInfo.charge === 0 ? 'text-primary' : ''}`}>
+                {deliveryInfo.charge === 0 ? 'FREE' : `₹${deliveryInfo.charge}`}
+              </span>
+            </div>
+            
+            {deliveryInfo.charge === 0 && (
+              <p className="text-xs text-primary text-center">
+                You're within 3km - Free delivery zone!
+              </p>
+            )}
+            
+            {/* Freshness guaranteed message for long distances */}
+            {isLongDistance && (
+              <div className="flex items-center gap-2 p-2 bg-accent rounded-lg border border-border">
+                <Leaf className="h-4 w-4 text-primary" />
+                <p className="text-xs text-foreground">
+                  Freshness Guaranteed! Your order will be packed with care for optimal quality.
+                </p>
+              </div>
+            )}
+          </CardContent>
+        </Card>
+        
+        {/* Detailed Address Form - Always show when location is set */}
+        <DetailedAddressForm 
+          value={detailedAddress}
+          onChange={onDetailedAddressChange}
+          locationAddress={deliveryInfo.destinationAddress}
+        />
+      </div>
     );
   }
 

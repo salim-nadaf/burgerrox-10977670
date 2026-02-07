@@ -3,7 +3,7 @@ import './About.css';
 
 const About = () => {
   return (
-    <section id="about" className="py-20 bg-secondary/30">
+    <section id="about" className="py-20 bg-background">
       <div className="container mx-auto px-4">
         <header className="text-center mb-16">
           <h2 className="font-bebas text-6xl md:text-7xl text-foreground tracking-wider mb-4">
@@ -15,30 +15,23 @@ const About = () => {
         </header>
 
         <div className="grid lg:grid-cols-2 gap-12 items-center">
-          <div className="oval-frame-container">
+          {/* Oval Image Frame - Logo visible on side */}
+          <div className="oval-image-wrapper">
             <div className="oval-frame">
               <img 
                 src="/brother-sister-duo.jpg" 
-                alt="Brother and Sister Duo - Founders of Burger Rox" 
-                className="w-full h-full object-cover"
+                alt="Brother and Sister Duo - Founders of Burger Rox with Burger Rox Logo" 
+                className="oval-image"
                 loading="lazy"
               />
             </div>
           </div>
 
+          {/* About Text */}
           <div className="space-y-6">
             <p className="font-montserrat text-lg text-muted-foreground leading-relaxed">
               A brother-sister duo on a mission to serve fresh, crispy, and flavourful burgers – no shortcuts, no gimmicks. She had been perfecting her craft for years, winning over relatives, neighbors, and anyone lucky enough to grab a bite. He saw something bigger – a brand built on trust and real flavor. Quality ingredients, honest recipes, and burgers made with care – one order at a time.
             </p>
-
-            <div className="logo-section">
-              <img 
-                src="/logo.png" 
-                alt="Burger Rox Logo" 
-                className="h-24 w-auto"
-                loading="lazy"
-              />
-            </div>
           </div>
         </div>
       </div>

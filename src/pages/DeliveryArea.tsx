@@ -67,7 +67,7 @@ const DeliveryArea = () => {
             </p>
 
             <p>
-              For any doubt about whether we deliver to your area, WhatsApp us at <a href="https://wa.me/919970078688" className="text-primary hover:underline" target="_blank" rel="noopener noreferrer">9970078688</a> or call <a href="tel:+919321389985" className="text-primary hover:underline">9321389985</a>.
+              For any doubt about whether we deliver to your area, WhatsApp us at <a href="https://wa.me/919321389985" className="text-primary hover:underline" target="_blank" rel="noopener noreferrer">9321389985</a> or call <a href="tel:+919970078688" className="text-primary hover:underline">9970078688</a> (alternate).
             </p>
           </div>
 

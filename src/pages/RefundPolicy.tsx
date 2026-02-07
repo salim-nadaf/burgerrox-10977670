@@ -49,8 +49,8 @@ const RefundPolicy = () => {
               <h2 className="font-bebas text-xl tracking-wide text-foreground mb-2">How to Request a Refund</h2>
               <p>Contact us as soon as possible with your order number and reason:</p>
               <ul className="list-disc pl-6 mt-2 space-y-1">
-                <li>WhatsApp: <a href="https://wa.me/919970078688" className="text-primary hover:underline" target="_blank" rel="noopener noreferrer">9970078688</a></li>
-                <li>Phone: <a href="tel:+919321389985" className="text-primary hover:underline">9321389985</a></li>
+                <li>WhatsApp: <a href="https://wa.me/919321389985" className="text-primary hover:underline" target="_blank" rel="noopener noreferrer">9321389985</a></li>
+                <li>Alternate: <a href="tel:+919970078688" className="text-primary hover:underline">9970078688</a></li>
                 <li>Email: <a href="mailto:cloudspicepvtltd@gmail.com" className="text-primary hover:underline">cloudspicepvtltd@gmail.com</a></li>
               </ul>
             </section>

@@ -1,1 +1,4 @@
-import React from 'react';\nimport './About.css';\n\nconst About = () => {\n    return (\n        <div className="about-container">\n            <div className="oval-frame">\n                <img src="/path/to/brother-sister-duo.jpg" alt="Brother and Sister Duo" />\n            </div>\n            <div className="logo-section">\n                <img src="/path/to/logo.png" alt="Logo" />\n            </div>\n        </div>\n    );\n};\n\nexport default About;
+<section id="about">
+  <h2>About Us</h2>
+  <p>We are a team dedicated to providing the best gourmet burgers for your enjoyment. Our passion for food drives us to create mouth-watering recipes that tantalize your taste buds.</p>
+</section>

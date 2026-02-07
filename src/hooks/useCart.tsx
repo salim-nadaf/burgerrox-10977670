@@ -75,6 +75,11 @@ export function CartProvider({ children }: { children: React.ReactNode }) {
       
       if (existingItem) {
         await updateQuantity(existingItem.id, existingItem.quantity + 1);
+        toast({
+          title: "Added to Cart ✓",
+          description: `${itemName} quantity updated`,
+          duration: 2000,
+        });
       } else {
         const { data, error } = await (supabase as any)
           .from('cart_items')
@@ -98,9 +103,11 @@ export function CartProvider({ children }: { children: React.ReactNode }) {
         }
 
         setCartItems(prev => [...prev, data]);
+        window.dispatchEvent(new CustomEvent('cart-item-added'));
         toast({
-          title: "Added to Cart",
+          title: "Added to Cart ✓",
           description: `${itemName} added to your cart`,
+          duration: 2000,
         });
       }
     } catch (error) {

@@ -30,7 +30,7 @@ const Footer = () => {
               </Link>
             </nav>
             <p className="font-montserrat text-sm text-accent-foreground/80">
-              © 2025 Burger Rox. All rights reserved.
+              © 2026 Burger Rox. All rights reserved.
             </p>
             <p className="font-montserrat text-xs text-accent-foreground/60 mt-1">
               Made with <span aria-label="love">❤️</span> by a caring homemaker mom

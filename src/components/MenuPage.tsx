@@ -92,6 +92,7 @@ const MenuPage = ({ showAll = false }: MenuPageProps) => {
   const { user } = useAuth();
   const [selectedCategory, setSelectedCategory] = useState<string>('All');
   const [authDialogOpen, setAuthDialogOpen] = useState(false);
+  const [pendingAddItem, setPendingAddItem] = useState<{ itemName: string; itemPrice: number } | null>(null);
 
   const displayItems = showAll ? allMenuItems : allMenuItems.slice(0, 6);
   const categories = ["All", "Fries", "Sides", "Chicken", "Egg", "Vegetarian", "Combos", "Beverages", "Desserts"];
@@ -103,6 +104,15 @@ const MenuPage = ({ showAll = false }: MenuPageProps) => {
   const handleAddToCart = async (itemName: string, itemPrice: number) => {
     await addToCart(itemName, itemPrice);
   };
+
+  const handleAuthSuccess = () => {
+    if (pendingAddItem) {
+      addToCart(pendingAddItem.itemName, pendingAddItem.itemPrice);
+      setPendingAddItem(null);
+    }
+    setAuthDialogOpen(false);
+  };
+  const handleAuthClose = () => setAuthDialogOpen(false);
 
   return (
     <section id="menu" className="py-12 sm:py-20 bg-secondary/30" aria-labelledby="menu-heading">
@@ -203,14 +213,19 @@ const MenuPage = ({ showAll = false }: MenuPageProps) => {
                               ) : (
                                 <Dialog open={authDialogOpen} onOpenChange={setAuthDialogOpen}>
                                   <DialogTrigger asChild>
-                                    <Button size="sm" className="text-xs px-2 py-1" aria-label={`Add ${burger.name} ${variant.size} to cart - login required`}>
+                                    <Button
+                                      size="sm"
+                                      className="text-xs px-2 py-1"
+                                      aria-label={`Add ${burger.name} ${variant.size} to cart - login required`}
+                                      onClick={() => setPendingAddItem({ itemName: `${burger.name} (${variant.size})`, itemPrice: variant.price })}
+                                    >
                                       Add to Cart
                                     </Button>
                                   </DialogTrigger>
                                   <DialogContent className="sm:max-w-md max-h-[90vh] overflow-y-auto">
                                     <DialogTitle className="sr-only">Authentication</DialogTitle>
                                     <DialogDescription className="sr-only">Login or create an account to add items to cart</DialogDescription>
-                                    <AuthForm onClose={() => setAuthDialogOpen(false)} />
+                                    <AuthForm onClose={handleAuthClose} onSuccess={handleAuthSuccess} />
                                   </DialogContent>
                                 </Dialog>
                               )}
@@ -231,14 +246,19 @@ const MenuPage = ({ showAll = false }: MenuPageProps) => {
                       ) : (
                         <Dialog open={authDialogOpen} onOpenChange={setAuthDialogOpen}>
                           <DialogTrigger asChild>
-                            <Button className="w-full" size="sm" aria-label={`Add ${burger.name} to cart - login required`}>
+                            <Button
+                              className="w-full"
+                              size="sm"
+                              aria-label={`Add ${burger.name} to cart - login required`}
+                              onClick={() => setPendingAddItem({ itemName: burger.name, itemPrice: burger.price })}
+                            >
                               Add to Cart
                             </Button>
                           </DialogTrigger>
                           <DialogContent className="sm:max-w-md max-h-[90vh] overflow-y-auto" role="dialog" aria-labelledby="auth-title">
                             <DialogTitle id="auth-title" className="sr-only">Authentication</DialogTitle>
                             <DialogDescription className="sr-only">Login or create an account to add items to cart</DialogDescription>
-                            <AuthForm onClose={() => setAuthDialogOpen(false)} />
+                            <AuthForm onClose={handleAuthClose} onSuccess={handleAuthSuccess} />
                           </DialogContent>
                         </Dialog>
                       )

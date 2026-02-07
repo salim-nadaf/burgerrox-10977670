@@ -1,3 +1,5 @@
+import { Link } from "react-router-dom";
+
 const Footer = () => {
   return (
     <footer className="py-12 bg-accent" role="contentinfo" aria-label="Site footer">
@@ -12,7 +14,21 @@ const Footer = () => {
             </p>
           </div>
 
-          <div className="text-center">
+          <div className="text-center space-y-3">
+            <nav className="flex flex-wrap justify-center gap-x-4 gap-y-1 text-sm" aria-label="Legal and info links">
+              <Link to="/privacy" className="text-accent-foreground/90 hover:text-accent-foreground underline">
+                Privacy
+              </Link>
+              <Link to="/refund-policy" className="text-accent-foreground/90 hover:text-accent-foreground underline">
+                Refund Policy
+              </Link>
+              <Link to="/terms" className="text-accent-foreground/90 hover:text-accent-foreground underline">
+                Terms & Conditions
+              </Link>
+              <Link to="/delivery-area" className="text-accent-foreground/90 hover:text-accent-foreground underline">
+                Delivery Area
+              </Link>
+            </nav>
             <p className="font-montserrat text-sm text-accent-foreground/80">
               © 2025 Burger Rox. All rights reserved.
             </p>

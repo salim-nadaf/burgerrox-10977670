@@ -9,9 +9,11 @@ import { Eye, EyeOff } from 'lucide-react';
 
 interface AuthFormProps {
   onClose: () => void;
+  /** Called after successful login or sign-up (before onClose). Use to e.g. add pending cart item. */
+  onSuccess?: () => void;
 }
 
-export default function AuthForm({ onClose }: AuthFormProps) {
+export default function AuthForm({ onClose, onSuccess }: AuthFormProps) {
   const [isLogin, setIsLogin] = useState(true);
   const [loading, setLoading] = useState(false);
   const [showPassword, setShowPassword] = useState(false);
@@ -104,6 +106,7 @@ export default function AuthForm({ onClose }: AuthFormProps) {
             title: "Welcome back!",
             description: "You have successfully logged in",
           });
+          onSuccess?.();
           onClose();
         }
       } else {
@@ -155,6 +158,7 @@ export default function AuthForm({ onClose }: AuthFormProps) {
             title: "Welcome to Burger Rox!",
             description: "Your account has been created and you're now logged in.",
           });
+          onSuccess?.();
           onClose();
         }
       }

@@ -1,5 +1,25 @@
 .about-circle {
-  aspect-ratio: 1 / 1;
+  max-width: 280px;
+  width: 100%;
+  height: auto;
   border-radius: 50%;
-  object-position: center 40%;
+  aspect-ratio: 1 / 1;
+}
+
+@media (max-width: 1024px) {
+  .about-circle {
+    max-width: 250px;
+  }
+}
+
+@media (max-width: 768px) {
+  .about-circle {
+    max-width: 220px;
+  }
+}
+
+@media (max-width: 480px) {
+  .about-circle {
+    max-width: 200px;
+  }
 }

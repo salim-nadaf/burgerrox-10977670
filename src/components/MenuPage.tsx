@@ -19,68 +19,65 @@ import { useAuth } from "@/hooks/useAuth";
 import AuthForm from "./AuthForm";
 
 const getItemImage = (name: string, category: string) => {
-  if (name.includes("Fries")) return friesImage;
+  if (name.includes("Fries") || name.includes("Wedges")) return friesImage;
   if (name.includes("Nuggets")) return nuggetsImage;
-  if (category === "Chicken") return chickenBurgerImage;
-  if (category === "Egg") return eggBurgerImage;
-  if (category === "Vegetarian") return veggieBurgerImage;
-  if (category === "Combos") return comboMealImage;
-  if (name.includes("Coke")) return cokeImage;
   if (name.includes("Lava Cake")) return lavaCakeImage;
+  if (name.includes("Coke")) return cokeImage;
+  if (category === "Non-Veg") return chickenBurgerImage;
+  if (category === "Veg") return veggieBurgerImage;
+  if (category === "Combos & Meals") return comboMealImage;
   return chickenBurgerImage; // default
 };
 
 const allMenuItems = [
-  // Fries
-  { name: "Salted Fries", description: "Hot, crunchy and irresistibly delicious.", price: 59, popular: true, category: "Fries", variants: [
+  // Non-Veg Burgers
+  { name: "Burger Rox Zinger", description: "Premium chicken breast fried to perfection with signature sauce and liquid cheese.", price: 259, popular: true, category: "Non-Veg" },
+  { name: "Chicken Classic", description: "Classic chicken burger with fresh toppings and signature sauce.", price: 89, popular: true, category: "Non-Veg" },
+  { name: "Chicken Blaze Crisp", description: "Crispy chicken with signature sauce, fresh onion, tomato and lettuce.", price: 99, popular: false, category: "Non-Veg", variants: [
+    { size: "Single Patty", price: 99 },
+    { size: "Double Patty", price: 139 }
+  ]},
+
+  // Veg Burgers
+  { name: "Aloo Tikki", description: "Crispy aloo tikki patty with onion, tomato, lettuce and signature sauce.", price: 79, popular: true, category: "Veg" },
+  { name: "Veggie Blaze Crisp", description: "Veg crispy burger with onion, tomato, lettuce and crispy patty.", price: 79, popular: false, category: "Veg", variants: [
+    { size: "Single Patty", price: 79 },
+    { size: "Double Patty", price: 119 }
+  ]},
+  { name: "Egg Cellent Fusion", description: "Aloo tikki with scrambled eggs, onion, tomato, lettuce and signature sauce.", price: 169, popular: false, category: "Veg" },
+  
+  // Sides
+  { name: "Salted Fries", description: "Hot, crunchy and irresistibly delicious.", price: 59, popular: true, category: "Sides", variants: [
     { size: "Small", price: 59 },
     { size: "Medium", price: 109 },
     { size: "Large", price: 129 }
   ]},
-  { name: "Peri Peri Fries", description: "Golden crisp fries tossed in a flavorful blend of herbs and spices.", price: 69, popular: true, category: "Fries", variants: [
+  { name: "Peri Peri Fries", description: "Golden crisp fries tossed in a flavorful blend of herbs and spices.", price: 69, popular: true, category: "Sides", variants: [
     { size: "Small", price: 69 },
     { size: "Medium", price: 119 },
     { size: "Large", price: 149 }
   ]},
-  
-  // Sides
   { name: "Chicken Nuggets [4 Pcs]", description: "Crispy fried chicken nuggets, perfect for a quick bite.", price: 89, popular: true, category: "Sides" },
   { name: "Potato Wedges", description: "Crispy golden potato wedges seasoned to perfection.", price: 1, popular: false, category: "Sides" },
-  
-  // Burgers
-  { name: "Burger Rox Zinger", description: "Premium chicken breast fried to perfection with signature sauce and liquid cheese.", price: 259, popular: true, category: "Chicken" },
-  { name: "Chicken Classic", description: "Classic chicken burger with fresh toppings and signature sauce.", price: 89, popular: true, category: "Chicken" },
-  { name: "Chicken Blaze Crisp", description: "Crispy chicken with signature sauce, fresh onion, tomato and lettuce.", price: 99, popular: false, category: "Chicken", variants: [
-    { size: "Single Patty", price: 99 },
-    { size: "Double Patty", price: 139 }
-  ]},
-  { name: "Egg Cellent Fusion", description: "Aloo tikki with scrambled eggs, onion, tomato, lettuce and signature sauce.", price: 169, popular: false, category: "Egg" },
-  { name: "Aloo Tikki", description: "Crispy aloo tikki patty with onion, tomato, lettuce and signature sauce.", price: 79, popular: true, category: "Vegetarian" },
-  { name: "Veggie Blaze Crisp", description: "Veg crispy burger with onion, tomato, lettuce and crispy patty.", price: 79, popular: false, category: "Vegetarian", variants: [
-    { size: "Single Patty", price: 79 },
-    { size: "Double Patty", price: 119 }
-  ]},
-  
-  // Combos
-  { name: "Classic Delight [Serves 2]", description: "2 Chicken Classic Burgers + Coke [250 ml].", price: 199, popular: true, category: "Combos" },
-  { name: "Veggie Crisp Duo [Serves 2]", description: "2 Veg Crispy Burgers + Golden Medium Fries.", price: 249, popular: false, category: "Combos" },
-  { name: "Rox Veggie Twist [Serves 2]", description: "2 Aloo Tikki burgers, medium fries and molten lava cake.", price: 274, popular: false, category: "Combos" },
-  { name: "Double Egg Stravagance [Serves 2]", description: "2 Aloo Tikki Egg Burgers + Chicken Nuggets [2 Pcs].", price: 299, popular: false, category: "Combos" },
-  { name: "Aloo Tikki Fiesta [Serves 4]", description: "4x the flavor with Indian spices and crispy texture, served with large Coke.", price: 349, popular: false, category: "Combos" },
-  { name: "Zinger Value Meal [Serves 2]", description: "2 Zinger Burgers + Medium Fries + Coke [250 ml] + Nuggets [2 Pcs].", price: 379, popular: false, category: "Combos" },
-  { name: "Crispy Chaos [Serves 4]", description: "2 Veg Crispy + 2 Chicken Crispy Patties + Large Fries.", price: 449, popular: true, category: "Combos" },
-  { name: "Rox Family Fiesta [Serves 4]", description: "4 Crispy Veg Burgers + Large Fries + Coke [350 ml].", price: 449, popular: true, category: "Combos" },
-  { name: "Classic Blaze Box [Serves 4]", description: "4 Chicken Classic + Nuggets [4 Pcs] + 2 Lava Cakes.", price: 499, popular: false, category: "Combos" },
-  { name: "Rox Zinger Blast [Serves 4]", description: "2 Zinger + 2 Classic Burgers + 2 Choco Lava Cakes.", price: 499, popular: true, category: "Combos" },
-  
+  { name: "Molten Lava Cake [80g]", description: "Rich, decadent cake oozing with warm, velvety chocolate center.", price: 79, popular: true, category: "Sides" },
+
   // Beverages
   { name: "Coke", description: "Refreshing coca cola.", price: 69, popular: true, category: "Beverages", variants: [
     { size: "Medium", price: 69 },
     { size: "Large", price: 99 }
   ]},
   
-  // Desserts
-  { name: "Molten Lava Cake [80g]", description: "Rich, decadent cake oozing with warm, velvety chocolate center.", price: 79, popular: true, category: "Desserts" },
+  // Combos & Meals
+  { name: "Classic Delight [Serves 2]", description: "2 Chicken Classic Burgers + Coke [250 ml].", price: 199, popular: true, category: "Combos & Meals" },
+  { name: "Veggie Crisp Duo [Serves 2]", description: "2 Veg Crispy Burgers + Golden Medium Fries.", price: 249, popular: false, category: "Combos & Meals" },
+  { name: "Rox Veggie Twist [Serves 2]", description: "2 Aloo Tikki burgers, medium fries and molten lava cake.", price: 274, popular: false, category: "Combos & Meals" },
+  { name: "Double Egg Stravagance [Serves 2]", description: "2 Aloo Tikki Egg Burgers + Chicken Nuggets [2 Pcs].", price: 299, popular: false, category: "Combos & Meals" },
+  { name: "Aloo Tikki Fiesta [Serves 4]", description: "4x the flavor with Indian spices and crispy texture, served with large Coke.", price: 349, popular: false, category: "Combos & Meals" },
+  { name: "Zinger Value Meal [Serves 2]", description: "2 Zinger Burgers + Medium Fries + Coke [250 ml] + Nuggets [2 Pcs].", price: 379, popular: false, category: "Combos & Meals" },
+  { name: "Crispy Chaos [Serves 4]", description: "2 Veg Crispy + 2 Chicken Crispy Patties + Large Fries.", price: 449, popular: true, category: "Combos & Meals" },
+  { name: "Rox Family Fiesta [Serves 4]", description: "4 Crispy Veg Burgers + Large Fries + Coke [350 ml].", price: 449, popular: true, category: "Combos & Meals" },
+  { name: "Classic Blaze Box [Serves 4]", description: "4 Chicken Classic + Nuggets [4 Pcs] + 2 Lava Cakes.", price: 499, popular: false, category: "Combos & Meals" },
+  { name: "Rox Zinger Blast [Serves 4]", description: "2 Zinger + 2 Classic Burgers + 2 Choco Lava Cakes.", price: 499, popular: true, category: "Combos & Meals" },
 ];
 
 interface MenuPageProps {
@@ -106,7 +103,7 @@ const MenuPage = ({ showAll = false }: MenuPageProps) => {
   }, [user, pendingAddItem, addToCart]);
 
   const displayItems = showAll ? allMenuItems : allMenuItems.slice(0, 6);
-  const categories = ["All", "Fries", "Sides", "Chicken", "Egg", "Vegetarian", "Combos", "Beverages", "Desserts"];
+  const categories = ["All", "Veg", "Non-Veg", "Sides", "Beverages", "Combos & Meals"];
   
   const filteredItems = selectedCategory === 'All' 
     ? displayItems 

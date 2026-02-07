@@ -1,4 +1,4 @@
-import { useState, useRef } from 'react';
+import { useState, useRef, useEffect, useCallback } from 'react';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
 import { Card, CardContent } from '@/components/ui/card';
@@ -50,6 +50,13 @@ export default function Cart() {
     area: '',
     pincode: ''
   });
+
+  // Listen for 'open-cart' events from toast clicks
+  const openCart = useCallback(() => setIsOpen(true), []);
+  useEffect(() => {
+    window.addEventListener('open-cart', openCart);
+    return () => window.removeEventListener('open-cart', openCart);
+  }, [openCart]);
   
   // Calculate grand total including delivery (no charge for pickup)
   const deliveryCharge = orderType === 'pickup' ? 0 : (deliveryInfo?.charge || 0);

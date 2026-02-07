@@ -1,4 +1,5 @@
 import { Users, Clock, DollarSign, Heart } from "lucide-react";
+import brotherSisterDuo from "@/assets/brother-sister-duo.jpg";
 
 const About = () => {
   const features = [
@@ -27,20 +28,35 @@ const About = () => {
   return (
     <section id="about" className="py-20 bg-background" aria-labelledby="about-heading">
       <div className="container mx-auto px-4">
-        <header className="text-center mb-16">
+        <header className="text-center mb-12">
           <h2 id="about-heading" className="font-bebas text-6xl md:text-7xl text-foreground tracking-wider mb-4">
             WHY WE ROX
           </h2>
           <p className="font-allura text-2xl md:text-3xl text-primary mb-6" role="doc-subtitle">
             Fresh burgers, honest flavours, zero shortcuts
           </p>
-          <p className="font-montserrat text-lg text-muted-foreground max-w-3xl mx-auto leading-relaxed">
-            A brother-sister duo on a mission to serve fresh, crispy, and flavourful burgers – no shortcuts, no gimmicks. 
-            She'd been perfecting her craft for years, winning over relatives, neighbors, and anyone lucky enough to grab a bite. 
-            He saw something bigger – a brand built on trust and real flavor. Quality ingredients, honest recipes, and burgers 
-            made with care – one order at a time.
-          </p>
         </header>
+
+        {/* Brother-Sister Duo Story with Image */}
+        <div className="flex flex-col md:flex-row items-center gap-8 mb-16 max-w-5xl mx-auto">
+          <div className="w-full md:w-2/5 flex-shrink-0">
+            <img 
+              src={brotherSisterDuo} 
+              alt="Burger Rox founders - the brother-sister duo behind the brand" 
+              className="rounded-2xl shadow-lg w-full object-cover aspect-[3/4] md:aspect-square"
+              loading="lazy"
+              decoding="async"
+            />
+          </div>
+          <div className="w-full md:w-3/5">
+            <p className="font-montserrat text-lg text-muted-foreground leading-relaxed">
+              A brother-sister duo on a mission to serve fresh, crispy, and flavourful burgers – no shortcuts, no gimmicks. 
+              She'd been perfecting her craft for years, winning over relatives, neighbors, and anyone lucky enough to grab a bite. 
+              He saw something bigger – a brand built on trust and real flavor. Quality ingredients, honest recipes, and burgers 
+              made with care – one order at a time.
+            </p>
+          </div>
+        </div>
 
         <div className="grid md:grid-cols-2 lg:grid-cols-4 gap-8" role="list" aria-label="Our features">
           {features.map((feature, index) => (

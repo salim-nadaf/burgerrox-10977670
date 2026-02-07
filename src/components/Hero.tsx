@@ -57,7 +57,7 @@ const Hero = () => {
                 variant="hero" 
                 size="xl" 
                 className="w-full sm:w-auto"
-                onClick={() => window.open('https://wa.me/919970078688', '_blank')}
+                onClick={() => window.open('https://wa.me/919321389985', '_blank')}
                 aria-label="Order on WhatsApp"
               >
                 Order Your Fix

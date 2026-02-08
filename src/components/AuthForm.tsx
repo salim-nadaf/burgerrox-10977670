@@ -1,35 +1,67 @@
-// Updated AuthForm.tsx
-
 import React, { useState } from 'react';
+import PropTypes from 'prop-types';
 
-const AuthForm = () => {
-    const [email, setEmail] = useState('');
+const AuthForm = ({ onAuth, isLoading, error }) => {
+  const [email, setEmail] = useState('');
+  const [password, setPassword] = useState('');
 
-    const handleForgotPassword = () => {
-        const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
-        if (!emailRegex.test(email)) {
-            alert('Please enter a valid email address.');
-            return;
-        }
-        // API call to send reset password email
-    };
+  const validateEmail = (email) => {
+    const regex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+    return regex.test(email);
+  };
 
-    return (
-        <form onSubmit={(e) => { e.preventDefault(); handleForgotPassword(); }}>
-            <input
-                type="email"
-                value={email}
-                onChange={(e) => setEmail(e.target.value)}
-                // Updated pattern attribute; regex validation in JS is relied upon instead
-                // pattern="[^
-\s@]+@[^
-\s@]+\.[^
-\s@]+"
-                required
-            />
-            <button type="submit">Forgot Password</button>
-        </form>
-    );
+  const validateForm = () => {
+    if (!validateEmail(email)) {
+      alert('Please enter a valid email address.');
+      return false;
+    }
+    if (password.trim().length < 6) {
+      alert('Password must be at least 6 characters long.');
+      return false;
+    }
+    return true;
+  };
+
+  const handleSubmit = (event) => {
+    event.preventDefault();
+    if (validateForm()) {
+      onAuth(email, password);
+    }
+  };
+
+  return (
+    <form onSubmit={handleSubmit}>
+      <div>
+        <label htmlFor="email">Email:</label>
+        <input
+          type="email"
+          id="email"
+          value={email}
+          onChange={(e) => setEmail(e.target.value)}
+          required
+          pattern="^[^\s@]+@[^\s@]+\.[^\s@]+$"
+        />
+      </div>
+      <div>
+        <label htmlFor="password">Password:</label>
+        <input
+          type="password"
+          id="password"
+          value={password}
+          onChange={(e) => setPassword(e.target.value)}
+          required
+        />
+      </div>
+      <button type="submit" disabled={isLoading}>Submit</button>
+      {error && <p>{error}</p>}
+    </form>
+  );
+};
+
+AuthForm.propTypes = {
+  onAuth: PropTypes.func.isRequired,
+  isLoading: PropTypes.bool,
+  error: PropTypes.string,
 };
 
 export default AuthForm;

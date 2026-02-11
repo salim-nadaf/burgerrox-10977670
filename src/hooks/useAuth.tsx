@@ -22,23 +22,17 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
-    console.log('useAuth: Setting up auth listener...');
-    
     // Set up auth state listener FIRST
     const { data: { subscription } } = supabase.auth.onAuthStateChange(
       (event, session) => {
-        console.log('Auth state changed:', event, 'Session:', session?.user?.id);
         setSession(session);
         setUser(session?.user ?? null);
         
-        // Fetch profile data when user signs in
         if (session?.user) {
           setTimeout(() => {
-            console.log('Fetching profile for user:', session.user.id);
             fetchUserProfile(session.user.id);
           }, 0);
         } else {
-          console.log('No user session, clearing profile');
           setProfile(null);
         }
         setLoading(false);
@@ -47,7 +41,6 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
 
     // THEN check for existing session
     supabase.auth.getSession().then(({ data: { session } }) => {
-      console.log('Initial session check:', session?.user?.id);
       setSession(session);
       setUser(session?.user ?? null);
       if (session?.user) {
@@ -57,14 +50,12 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
     });
 
     return () => {
-      console.log('Cleaning up auth subscription');
       subscription.unsubscribe();
     };
   }, []);
 
   const fetchUserProfile = async (userId: string) => {
     try {
-      console.log('Fetching profile for user:', userId);
       const { data, error } = await (supabase as any)
         .from('profiles')
         .select('*')
@@ -76,7 +67,6 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
         return;
       }
 
-      console.log('Profile fetched:', data);
       setProfile(data);
     } catch (error) {
       console.error('Error fetching profile:', error);
@@ -87,7 +77,6 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
     try {
       const redirectUrl = `${window.location.origin}/`;
       
-      console.log('Signing up user:', email);
       const { data, error } = await supabase.auth.signUp({
         email,
         password,
@@ -100,8 +89,6 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
           }
         }
       });
-      
-      console.log('Signup result:', { data, error });
       
       // Check if email confirmation is required
       if (data?.user && !data?.session && !error) {
@@ -124,12 +111,10 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
 
   const signIn = async (email: string, password: string) => {
     try {
-      console.log('Signing in user:', email);
       const { data, error } = await supabase.auth.signInWithPassword({
         email,
         password
       });
-      console.log('Signin result:', { data, error });
       return { error };
     } catch (networkError: any) {
       console.error('Network error during signin:', networkError);

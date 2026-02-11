@@ -15,12 +15,6 @@ export default function WelcomeMessage() {
     }
   }, [user, profile]);
 
-  // Debug logging
-  console.log('WelcomeMessage - User:', user?.id);
-  console.log('WelcomeMessage - Profile:', profile);
-  console.log('WelcomeMessage - Loading:', loading);
-  console.log('WelcomeMessage - IsNewUser:', isNewUser);
-
   if (loading) {
     return null;
   }

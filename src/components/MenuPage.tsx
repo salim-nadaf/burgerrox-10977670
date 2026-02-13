@@ -74,11 +74,11 @@ interface MenuItem {
 const allMenuItems: MenuItem[] = [
   // Burgers
   { name: "Blaze Chicken Burger", description: "Crispy chicken patty with fresh veggies and our rockin' homemade blaze sauce.", price: 129, popular: true, category: "Burgers", foodType: "nonveg", section: ["Most Popular", "All Burgers"], hasAddons: true },
-  { name: "Blaze Veg Burger", description: "Golden veg patty, crunchy lettuce, and signature blaze sauce in a soft bun.", price: 149, popular: true, category: "Burgers", foodType: "veg", section: ["Most Popular", "All Burgers"], hasAddons: true },
+  { name: "Blaze Veg Burger", description: "Golden veg patty, crunchy lettuce, and signature blaze sauce in a soft bun.", price: 89, popular: true, category: "Burgers", foodType: "veg", section: ["Most Popular", "All Burgers"], hasAddons: true },
   { name: "Aloo Rock Burger", description: "Classic aloo tikki with onions, lettuce, and our homemade signature sauce.", price: 99, popular: false, category: "Burgers", foodType: "veg", section: ["All Burgers"], hasAddons: true },
   { name: "Egg Blaze Smash", description: "Crispy aloo tikki topped with scrambled egg and loaded with blaze sauce.", price: 169, popular: false, category: "Burgers", foodType: "egg", section: ["All Burgers"], hasAddons: true },
   { name: "Double Blaze Chicken", description: "Two crispy chicken patties stacked with fresh veggies and double blaze flavor.", price: 199, popular: false, category: "Burgers", foodType: "nonveg", section: ["All Burgers"], hasAddons: true },
-  { name: "Double Blaze Veg", description: "Double veg patties with crunchy lettuce and extra signature sauce.", price: 169, popular: false, category: "Burgers", foodType: "veg", section: ["All Burgers"], hasAddons: true },
+  { name: "Double Blaze Veg", description: "Double veg patties with crunchy lettuce and extra signature sauce.", price: 149, popular: false, category: "Burgers", foodType: "veg", section: ["All Burgers"], hasAddons: true },
   { name: "Burger Rox Zinger", description: "Our premium zinger-style chicken burger with bold spices and signature sauce.", price: 259, popular: true, category: "Burgers", foodType: "nonveg", section: ["All Burgers"], hasAddons: true },
 
   // Combos

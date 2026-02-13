@@ -54,7 +54,9 @@ const Cart = () => {
   }, []);
 
   const deliveryCharge = orderType === "delivery" && deliveryInfo ? deliveryInfo.charge : 0;
-  const grandTotal = totalAmount + deliveryCharge;
+  const ONLINE_DISCOUNT = 10;
+  const onlineDiscount = paymentMethod === "online" ? ONLINE_DISCOUNT : 0;
+  const grandTotal = totalAmount + deliveryCharge - onlineDiscount;
 
   const generateWhatsAppMessage = (orderNumber: string) => {
     const orderItems = cartItems
@@ -63,7 +65,7 @@ const Cart = () => {
 
     const customerName = profile?.name || "Guest";
     const customerWhatsApp = profile?.whatsapp_number || "N/A";
-    const paymentLabel = paymentMethod === "online" ? "Paid Online" : orderType === "pickup" ? "Cash on Pickup" : "Cash on Delivery";
+    const paymentLabel = paymentMethod === "online" ? "Paid Online" : orderType === "pickup" ? "Pay on Pickup" : "Pay on Delivery";
 
     if (orderType === "pickup") {
       return `--- BURGER ROX ORDER ---
@@ -76,7 +78,7 @@ WhatsApp: ${customerWhatsApp}
 
 ${orderItems}
 
-TOTAL: ₹${totalAmount.toFixed(2)}
+TOTAL: ₹${grandTotal.toFixed(2)}${onlineDiscount > 0 ? `\n(Online Payment Discount: -₹${onlineDiscount})` : ''}
 
 Payment: ${paymentLabel}
 
@@ -87,6 +89,7 @@ Customer will arrive after confirmation.`;
     } else {
       const subtotalLine = `Subtotal: ₹${totalAmount.toFixed(2)}`;
       const deliveryLine = `Delivery Charge: ${deliveryCharge === 0 ? "FREE" : `₹${deliveryCharge}`}`;
+      const discountLine = onlineDiscount > 0 ? `Online Discount: -₹${onlineDiscount}` : '';
       const totalLine = `TOTAL: ₹${grandTotal.toFixed(2)}`;
 
       const fullAddr = formatFullAddress(detailedAddress, deliveryInfo?.destinationAddress);
@@ -106,7 +109,7 @@ WhatsApp: ${customerWhatsApp}
 ${orderItems}
 
 ${subtotalLine}
-${deliveryLine}
+${deliveryLine}${discountLine ? `\n${discountLine}` : ''}
 ${totalLine}
 
 Payment: ${paymentLabel}
@@ -183,7 +186,7 @@ Please confirm delivery time.`;
 
     const customerName = profile?.name || "Guest";
     const customerWhatsApp = profile?.whatsapp_number || "N/A";
-    const paymentLabel = orderType === "pickup" ? "Cash on Pickup" : "Cash on Delivery";
+    const paymentLabel = orderType === "pickup" ? "Pay on Pickup" : "Pay on Delivery";
 
     if (orderType === "pickup") {
       return `--- BURGER ROX ORDER ---
@@ -420,6 +423,12 @@ Please confirm delivery time.`;
                     <span>{deliveryCharge === 0 ? "FREE" : `₹${deliveryCharge}`}</span>
                   </div>
                 )}
+                {paymentMethod === "online" && (
+                  <div className="flex justify-between text-green-600">
+                    <span>Online Payment Discount</span>
+                    <span>-₹{ONLINE_DISCOUNT}</span>
+                  </div>
+                )}
                 <div className="flex justify-between font-semibold text-base">
                   <span>Total</span>
                   <span className="text-primary">₹{grandTotal.toFixed(2)}</span>
@@ -446,37 +455,65 @@ Please confirm delivery time.`;
                 Every burger made with our homemade signature sauce.
               </p>
 
-              {/* Payment Buttons */}
+              {/* Payment method selector */}
               <div className="space-y-2">
-                <Button
-                  className="w-full" variant="brand" size="lg"
-                  onClick={handleCODOrder}
-                  disabled={!canPlaceOrder() || isProcessing || !isCODAllowed}
-                >
-                  <Banknote className="h-4 w-4 mr-2" />
-                  {isCODAllowed
-                    ? "Confirm on WhatsApp"
-                    : orderType === "pickup" ? "Cash on Pickup" : "Cash on Delivery"}
-                </Button>
-                {!isCODAllowed && (
-                  <p className="text-xs text-center text-destructive font-montserrat">
-                    Cash on Delivery available only for orders ₹{COD_MINIMUM} and above.
-                  </p>
-                )}
-                {isCODAllowed && (
-                  <p className="text-xs text-center text-muted-foreground font-montserrat">
-                    Our team will confirm your order on WhatsApp before delivery.
-                  </p>
-                )}
+                <p className="font-montserrat text-xs font-medium text-foreground">Payment Method:</p>
+                <div className="flex gap-2">
+                  <Button
+                    variant={paymentMethod === "cod" ? "default" : "outline"} size="sm" className="flex-1"
+                    onClick={() => setPaymentMethod("cod")}
+                  >
+                    <Banknote className="h-4 w-4 mr-1" />
+                    {orderType === "pickup" ? "Pay on Pickup" : "Pay on Delivery"}
+                  </Button>
+                  <Button
+                    variant={paymentMethod === "online" ? "default" : "outline"} size="sm" className="flex-1"
+                    onClick={() => setPaymentMethod("online")}
+                  >
+                    <CreditCard className="h-4 w-4 mr-1" />
+                    Pay Online
+                  </Button>
+                </div>
+                <p className="text-xs text-center text-green-600 font-montserrat">
+                  Pay online and save ₹10 on your order.
+                </p>
+              </div>
 
-                <Button
-                  className="w-full" variant="default" size="lg"
-                  onClick={handleOnlinePayment}
-                  disabled={!canPlaceOrder() || isProcessing}
-                >
-                  <CreditCard className="h-4 w-4 mr-2" />
-                  Pay Online (UPI / Card)
-                </Button>
+              {/* Action Buttons */}
+              <div className="space-y-2">
+                {paymentMethod === "cod" ? (
+                  <>
+                    <Button
+                      className="w-full" variant="brand" size="lg"
+                      onClick={handleCODOrder}
+                      disabled={!canPlaceOrder() || isProcessing || !isCODAllowed}
+                    >
+                      <Banknote className="h-4 w-4 mr-2" />
+                      {isCODAllowed
+                        ? (orderType === "pickup" ? "Pay on Pickup" : "Pay on Delivery")
+                        : (orderType === "pickup" ? "Pay on Pickup" : "Pay on Delivery")}
+                    </Button>
+                    {!isCODAllowed && (
+                      <p className="text-xs text-center text-destructive font-montserrat">
+                        {orderType === "pickup" ? "Pay on Pickup" : "Pay on Delivery"} available only for orders ₹{COD_MINIMUM} and above.
+                      </p>
+                    )}
+                    {isCODAllowed && (
+                      <p className="text-xs text-center text-muted-foreground font-montserrat">
+                        Our team will confirm your order on WhatsApp before {orderType === "pickup" ? "preparation" : "delivery"}.
+                      </p>
+                    )}
+                  </>
+                ) : (
+                  <Button
+                    className="w-full" variant="default" size="lg"
+                    onClick={handleOnlinePayment}
+                    disabled={!canPlaceOrder() || isProcessing}
+                  >
+                    <CreditCard className="h-4 w-4 mr-2" />
+                    Pay Online (UPI / Card) — Save ₹10
+                  </Button>
+                )}
               </div>
 
               <Button variant="ghost" size="sm" className="w-full text-muted-foreground" onClick={clearCart}>

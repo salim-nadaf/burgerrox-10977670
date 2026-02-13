@@ -68,7 +68,7 @@ const Hero = () => {
 
             <div className="flex items-center justify-center space-x-4 sm:space-x-8 mt-12 text-center" role="list" aria-label="Key features">
               <div className="font-montserrat" role="listitem">
-                <div className="font-bebas text-2xl sm:text-3xl text-primary" aria-label="Starting from 79 rupees">₹79</div>
+                <div className="font-bebas text-2xl sm:text-3xl text-primary" aria-label="Starting from 89 rupees">₹89</div>
                 <div className="text-xs sm:text-sm text-muted-foreground">Affordable</div>
               </div>
               <div className="w-px h-12 bg-border" aria-hidden="true"></div>

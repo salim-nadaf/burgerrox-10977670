@@ -186,6 +186,7 @@ Please confirm order and expected time.`;
       total: grandTotal,
       payment: pMethod === "online" ? "Paid Online" : orderType === "pickup" ? "Pay on Pickup" : "Pay on Delivery",
       status: "NEW",
+      cancel_reason: "",
     };
   };
 
@@ -210,6 +211,10 @@ Please confirm order and expected time.`;
   const handleCODOrder = () => {
     if (!user) {
       toast({ title: "Login Required", description: "Please login to place an order", variant: "destructive" });
+      return;
+    }
+    if (!profile?.name || !profile?.whatsapp_number) {
+      toast({ title: "Profile Incomplete", description: "Please complete your profile before placing an order.", variant: "destructive" });
       return;
     }
     if (!canPlaceOrder() || isBelowDeliveryMinimum) return;
@@ -243,6 +248,10 @@ Please confirm order and expected time.`;
   const handleOnlinePayment = async () => {
     if (!user) {
       toast({ title: "Login Required", description: "Please login to place an order", variant: "destructive" });
+      return;
+    }
+    if (!profile?.name || !profile?.whatsapp_number) {
+      toast({ title: "Profile Incomplete", description: "Please complete your profile before placing an order.", variant: "destructive" });
       return;
     }
     if (!canPlaceOrder()) return;

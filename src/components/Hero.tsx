@@ -10,14 +10,15 @@ const Hero = () => {
         <img 
           src={heroImage} 
           alt="" 
-          className="w-full h-full object-cover opacity-50"
+          className="w-full h-full object-cover"
           width="1920"
           height="1080"
           loading="eager"
           fetchPriority="high"
           decoding="async"
         />
-        <div className="absolute inset-0 bg-gradient-to-r from-background/60 to-background/40"></div>
+        <div className="absolute inset-0 bg-black/40"></div>
+        <div className="absolute inset-0 bg-gradient-to-r from-background/40 to-transparent"></div>
       </div>
 
       {/* Restaurant Guru Recommended Badge - Top Right Position */}
@@ -39,15 +40,15 @@ const Hero = () => {
       <div className="container mx-auto px-4 z-10">
         <div className="max-w-4xl mx-auto text-center">
           <div className="space-y-6">
-            <h1 id="hero-heading" className="font-bebas text-7xl md:text-9xl text-foreground leading-none tracking-wider">
+            <h1 id="hero-heading" className="font-bebas text-7xl md:text-9xl text-white leading-none tracking-wider font-bold drop-shadow-lg">
               CRAVE-WORTHY BURGERS
             </h1>
             
-            <p className="font-allura text-3xl md:text-4xl text-foreground mt-4" role="doc-subtitle">
+            <p className="font-allura text-3xl md:text-4xl text-white mt-4 drop-shadow-md" role="doc-subtitle">
               Rockin' homemade flavor
             </p>
 
-            <p className="font-montserrat text-sm md:text-base text-muted-foreground mt-2">
+            <p className="font-montserrat text-sm md:text-base text-white/80 mt-2">
               Burgers made with our homemade signature sauce.
             </p>
 
@@ -69,27 +70,27 @@ const Hero = () => {
             <div className="flex items-center justify-center space-x-4 sm:space-x-8 mt-12 text-center" role="list" aria-label="Key features">
               <div className="font-montserrat" role="listitem">
                 <div className="font-bebas text-2xl sm:text-3xl text-primary" aria-label="Starting from 89 rupees">₹89</div>
-                <div className="text-xs sm:text-sm text-muted-foreground">Affordable</div>
+                <div className="text-xs sm:text-sm text-white/70">Affordable</div>
               </div>
-              <div className="w-px h-12 bg-border" aria-hidden="true"></div>
+              <div className="w-px h-12 bg-white/30" aria-hidden="true"></div>
               <div className="font-montserrat" role="listitem">
                 <div className="font-bebas text-2xl sm:text-3xl text-primary" aria-label="30 minute delivery">30MIN</div>
-                <div className="text-xs sm:text-sm text-muted-foreground">Quick Delivery</div>
+                <div className="text-xs sm:text-sm text-white/70">Quick Delivery</div>
               </div>
-              <div className="w-px h-12 bg-border" aria-hidden="true"></div>
+              <div className="w-px h-12 bg-white/30" aria-hidden="true"></div>
               <div className="font-montserrat" role="listitem">
                 <div className="font-bebas text-2xl sm:text-3xl text-primary" aria-label="4.6 star rating">4.6★</div>
-              <div className="text-xs sm:text-sm text-muted-foreground">Customer Rated</div>
+              <div className="text-xs sm:text-sm text-white/70">Customer Rated</div>
               </div>
             </div>
 
-            <p className="font-montserrat text-xs text-muted-foreground mt-4 italic">
+            <p className="font-montserrat text-xs text-white/60 mt-4 italic">
               Fresh batches. Homemade sauce. Evening only.
             </p>
 
-            <div className="flex items-center justify-center gap-2 mt-4 px-4 py-2 bg-foreground/10 backdrop-blur-sm rounded-full border border-border/50 w-fit mx-auto">
+            <div className="flex items-center justify-center gap-2 mt-4 px-4 py-2 bg-black/30 backdrop-blur-sm rounded-full border border-white/20 w-fit mx-auto">
               <Clock className="h-4 w-4 text-primary" />
-              <span className="font-montserrat text-sm text-foreground font-medium">
+              <span className="font-montserrat text-sm text-white font-medium">
                 Orders open daily from 7 PM to 10 PM
               </span>
             </div>

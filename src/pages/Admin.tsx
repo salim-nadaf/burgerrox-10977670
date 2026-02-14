@@ -9,6 +9,7 @@ import { ScrollArea } from '@/components/ui/scroll-area';
 import { Separator } from '@/components/ui/separator';
 import { toast } from '@/components/ui/use-toast';
 import { supabase } from '@/integrations/supabase/client';
+import { sendToGoogleSheet } from '@/components/Cart';
 import { Lock, RefreshCw, Package, Clock, CheckCircle, Truck, XCircle, ChefHat } from 'lucide-react';
 import { format } from 'date-fns';
 
@@ -132,8 +133,28 @@ export default function Admin() {
       if (error) throw error;
 
       if (data?.success) {
-        setOrders(prev => prev.map(order => 
-          order.id === orderId ? { ...order, status: newStatus } : order
+        // Find the order to get the order_number for Google Sheet sync
+        const order = orders.find(o => o.id === orderId);
+        const statusMap: Record<string, string> = {
+          pending: "NEW",
+          confirmed: "CONFIRMED",
+          preparing: "PREPARING",
+          out_for_delivery: "OUT FOR DELIVERY",
+          delivered: "DELIVERED",
+          cancelled: "CANCELLED",
+        };
+
+        // Sync status to Google Sheet
+        if (order) {
+          sendToGoogleSheet({
+            order_id: order.order_number,
+            status: statusMap[newStatus] || newStatus.toUpperCase(),
+            cancel_reason: newStatus === "cancelled" ? "" : undefined,
+          });
+        }
+
+        setOrders(prev => prev.map(o => 
+          o.id === orderId ? { ...o, status: newStatus } : o
         ));
         toast({ title: 'Success', description: `Order status updated to ${statusConfig[newStatus].label}` });
       }

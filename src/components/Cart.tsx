@@ -3,7 +3,7 @@ import { Sheet, SheetContent, SheetHeader, SheetTitle, SheetTrigger } from "@/co
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { Separator } from "@/components/ui/separator";
-import { Dialog, DialogContent, DialogTitle, DialogDescription } from "@/components/ui/dialog";
+import { Dialog, DialogContent, DialogTitle, DialogDescription, DialogHeader, DialogFooter } from "@/components/ui/dialog";
 import { ShoppingCart, Plus, Minus, Trash2, Send, CreditCard, Banknote } from "lucide-react";
 import { useCart } from "@/hooks/useCart";
 import { useAuth } from "@/hooks/useAuth";
@@ -21,13 +21,38 @@ declare global {
   }
 }
 
+const GOOGLE_SHEET_WEBHOOK = "https://script.google.com/macros/s/AKfycbwhTIw0hZ_WPwwwrAxv1wRDsUIVRLTIKquXbl0mW8zQ8flJpUqUPRp-Lzl1lpiyiH6zsQ/exec";
+
+export const sendToGoogleSheet = async (orderData: Record<string, unknown>) => {
+  try {
+    await fetch(GOOGLE_SHEET_WEBHOOK, {
+      method: "POST",
+      mode: "no-cors",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify(orderData),
+    });
+  } catch (err) {
+    console.error("Google Sheet webhook error:", err);
+  }
+};
+
 const Cart = () => {
   const [isOpen, setIsOpen] = useState(false);
   const [orderType, setOrderType] = useState<OrderType>("pickup");
   const [paymentMethod, setPaymentMethod] = useState<"cod" | "online">("cod");
   const [isProcessing, setIsProcessing] = useState(false);
   const [confirmDialogOpen, setConfirmDialogOpen] = useState(false);
-  const [lastOrder, setLastOrder] = useState<{ orderNumber: string; whatsappMessage: string } | null>(null);
+  const [lastOrder, setLastOrder] = useState<{
+    orderNumber: string;
+    whatsappMessage: string;
+    orderType: string;
+    items: { item_name: string; item_price: number; quantity: number }[];
+    subtotal: number;
+    delivery: number;
+    discount: number;
+    total: number;
+    payment: string;
+  } | null>(null);
   const [detailedAddress, setDetailedAddress] = useState<DetailedAddress>({
     flatNo: "", building: "", area: "", pincode: ""
   });
@@ -65,6 +90,11 @@ const Cart = () => {
     return `BRX-${String(newNum).padStart(3, "0")}`;
   };
 
+  const getPaymentLabel = (pMethod: string) => {
+    if (pMethod === "online") return "Paid Online";
+    return orderType === "pickup" ? "Pay on Pickup" : "Pay on Delivery";
+  };
+
   const generateWhatsAppMessage = (orderNumber: string) => {
     const itemsList = cartItems
       .map((item) => `• ${item.item_name} x${item.quantity} — ₹${(item.item_price * item.quantity).toFixed(2)}`)
@@ -72,69 +102,55 @@ const Cart = () => {
 
     const customerName = profile?.name || "Guest";
     const customerWhatsApp = profile?.whatsapp_number || "N/A";
-    const paymentLabel = paymentMethod === "online" ? "Paid Online" : orderType === "pickup" ? "Pay on Pickup" : "Pay on Delivery";
+    const paymentLabel = getPaymentLabel(paymentMethod);
 
-    if (orderType === "pickup") {
-      return `--- BURGER ROX ORDER ---
+    let msg = `--- BURGER ROX ORDER ---
 
 Order ID: ${orderNumber}
-Order Type: PICKUP
+Order Type: ${orderType === "pickup" ? "PICKUP" : "DELIVERY"}
 
 Customer: ${customerName}
 WhatsApp: ${customerWhatsApp}
 
+Items:
 ${itemsList}
 
-TOTAL: ₹${grandTotal.toFixed(2)}${onlineDiscount > 0 ? `\n(Online Payment Discount: -₹${onlineDiscount})` : ''}
+Subtotal: ₹${totalAmount.toFixed(2)}
+Delivery: ${deliveryCharge === 0 ? "₹0" : `₹${deliveryCharge}`}
+Discount: ${onlineDiscount > 0 ? `-₹${onlineDiscount}` : "₹0"}
+TOTAL: ₹${grandTotal.toFixed(2)}
 
-Payment: ${paymentLabel}
+Payment: ${paymentLabel}`;
 
-Pickup Location: ${RESTAURANT_ADDRESS}
-
-Please confirm preparation time.
-Customer will arrive after confirmation.`;
-    } else {
-      const subtotalLine = `Subtotal: ₹${totalAmount.toFixed(2)}`;
-      const deliveryLine = `Delivery Charge: ${deliveryCharge === 0 ? "FREE" : `₹${deliveryCharge}`}`;
-      const discountLine = onlineDiscount > 0 ? `Online Discount: -₹${onlineDiscount}` : '';
-      const totalLine = `TOTAL: ₹${grandTotal.toFixed(2)}`;
-
+    if (orderType === "delivery") {
       const fullAddr = formatFullAddress(detailedAddress, deliveryInfo?.destinationAddress);
       const mapsLink = deliveryInfo?.lat && deliveryInfo?.lng
         ? `https://www.google.com/maps?q=${deliveryInfo.lat},${deliveryInfo.lng}`
         : "";
-      const landmark = detailedAddress.building || "N/A";
 
-      let msg = `--- BURGER ROX ORDER ---
-
-Order ID: ${orderNumber}
-Order Type: DELIVERY
-
-Customer: ${customerName}
-WhatsApp: ${customerWhatsApp}
-
-${itemsList}
-
-${subtotalLine}
-${deliveryLine}${discountLine ? `\n${discountLine}` : ''}
-${totalLine}
-
-Payment: ${paymentLabel}
-${mapsLink ? `\nGoogle Maps: ${mapsLink}` : ""}
+      msg += `
 
 Delivery Address:
-${fullAddr}
+${fullAddr}${mapsLink ? `\n\nGoogle Maps: ${mapsLink}` : ""}
 
-Landmark: ${landmark}
-
-Please confirm delivery time.`;
+Please confirm order and expected time.`;
 
       if (paymentLabel === "Pay on Delivery") {
-        msg += `\n\nNote: Pay via UPI when rider arrives.\nUPI details will be shared here before delivery.`;
-      }
+        msg += `
 
-      return msg;
+Note:
+Pay via UPI when rider arrives.
+UPI details will be shared here before delivery.`;
+      }
+    } else {
+      msg += `
+
+Pickup Location: ${RESTAURANT_ADDRESS}
+
+Please confirm order and expected time.`;
     }
+
+    return msg;
   };
 
   const canPlaceOrder = () => {
@@ -147,70 +163,8 @@ Please confirm delivery time.`;
     return true;
   };
 
-  const placeOrder = async (pMethod: "cod" | "online", paymentId?: string, paymentStatus?: string) => {
-    if (!user || !canPlaceOrder()) return;
-
-    setIsProcessing(true);
-    try {
-      const order = await createOrder({
-        items: cartItems.map((item) => ({
-          item_name: item.item_name,
-          item_price: item.item_price,
-          quantity: item.quantity,
-        })),
-        totalAmount: grandTotal,
-        paymentMethod: pMethod,
-        paymentStatus: paymentStatus || (pMethod === "online" ? "paid" : "pending"),
-        paymentId,
-      });
-
-      if (!order) {
-        toast({ title: "Error", description: "Failed to create order. Please try again.", variant: "destructive" });
-        setIsProcessing(false);
-        return;
-      }
-
-      const brxId = generateOrderId();
-      const whatsappMessage = generateWhatsAppMessage(brxId);
-      setLastOrder({ orderNumber: brxId, whatsappMessage });
-
-      // Send to Google Sheet (non-blocking)
-      sendToGoogleSheet(buildSheetPayload(brxId, pMethod));
-
-      await clearCart();
-      if (orderType === "delivery") clearDelivery();
-      setDetailedAddress({ flatNo: "", building: "", area: "", pincode: "" });
-
-      // Close cart sheet, then show confirmation dialog
-      setIsOpen(false);
-      document.body.style.pointerEvents = "auto";
-      setTimeout(() => setConfirmDialogOpen(true), 300);
-    } catch (error) {
-      console.error("Order error:", error);
-      toast({ title: "Error", description: "Something went wrong. Please try again.", variant: "destructive" });
-    } finally {
-      setIsProcessing(false);
-    }
-  };
-
   const COD_MINIMUM = 149;
-  const isCODAllowed = orderType === "pickup" || grandTotal >= COD_MINIMUM;
-
-  const sendToGoogleSheet = async (orderData: Record<string, unknown>) => {
-    try {
-      await fetch(
-        "https://script.google.com/macros/s/AKfycbwhTIw0hZ_WPwwwrAxv1wRDsUIVRLTIKquXbl0mW8zQ8flJpUqUPRp-Lzl1lpiyiH6zsQ/exec",
-        {
-          method: "POST",
-          mode: "no-cors",
-          headers: { "Content-Type": "application/json" },
-          body: JSON.stringify(orderData),
-        }
-      );
-    } catch (err) {
-      console.error("Google Sheet webhook error:", err);
-    }
-  };
+  const isBelowDeliveryMinimum = orderType === "delivery" && grandTotal < COD_MINIMUM;
 
   const buildSheetPayload = (orderId: string, pMethod: string) => {
     const itemsSummary = cartItems
@@ -231,6 +185,25 @@ Please confirm delivery time.`;
       discount: pMethod === "online" ? onlineDiscount : 0,
       total: grandTotal,
       payment: pMethod === "online" ? "Paid Online" : orderType === "pickup" ? "Pay on Pickup" : "Pay on Delivery",
+      status: "NEW",
+    };
+  };
+
+  const prepareOrder = (pMethod: "cod" | "online") => {
+    const orderId = generateOrderId();
+    const whatsappMessage = generateWhatsAppMessage(orderId);
+    const paymentLabel = getPaymentLabel(pMethod);
+
+    return {
+      orderId,
+      whatsappMessage,
+      orderType: orderType === "pickup" ? "PICKUP" : "DELIVERY",
+      items: cartItems.map(i => ({ item_name: i.item_name, item_price: i.item_price, quantity: i.quantity })),
+      subtotal: totalAmount,
+      delivery: deliveryCharge,
+      discount: pMethod === "online" ? onlineDiscount : 0,
+      total: grandTotal,
+      payment: paymentLabel,
     };
   };
 
@@ -239,22 +212,32 @@ Please confirm delivery time.`;
       toast({ title: "Login Required", description: "Please login to place an order", variant: "destructive" });
       return;
     }
-    if (!canPlaceOrder() || !isCODAllowed) return;
+    if (!canPlaceOrder() || isBelowDeliveryMinimum) return;
 
-    const orderId = generateOrderId();
-    const whatsappMessage = generateWhatsAppMessage(orderId);
+    const prepared = prepareOrder("cod");
 
     // Send to Google Sheet (non-blocking)
-    sendToGoogleSheet(buildSheetPayload(orderId, "cod"));
+    sendToGoogleSheet(buildSheetPayload(prepared.orderId, "cod"));
 
-    window.open(`https://wa.me/919321389985?text=${encodeURIComponent(whatsappMessage)}`, "_blank");
+    setLastOrder({
+      orderNumber: prepared.orderId,
+      whatsappMessage: prepared.whatsappMessage,
+      orderType: prepared.orderType,
+      items: prepared.items,
+      subtotal: prepared.subtotal,
+      delivery: prepared.delivery,
+      discount: prepared.discount,
+      total: prepared.total,
+      payment: prepared.payment,
+    });
 
-    // Clear cart after sending to WhatsApp
+    // Clear cart
     clearCart();
     if (orderType === "delivery") clearDelivery();
     setDetailedAddress({ flatNo: "", building: "", area: "", pincode: "" });
     setIsOpen(false);
     document.body.style.pointerEvents = "auto";
+    setTimeout(() => setConfirmDialogOpen(true), 300);
   };
 
   const handleOnlinePayment = async () => {
@@ -288,7 +271,48 @@ Please confirm delivery time.`;
         description: "Food Order",
         order_id: data.orderId,
         handler: async (response: any) => {
-          await placeOrder("online", response.razorpay_payment_id, "paid");
+          // Create order in DB
+          const order = await createOrder({
+            items: cartItems.map((item) => ({
+              item_name: item.item_name,
+              item_price: item.item_price,
+              quantity: item.quantity,
+            })),
+            totalAmount: grandTotal,
+            paymentMethod: "online",
+            paymentStatus: "paid",
+            paymentId: response.razorpay_payment_id,
+          });
+
+          if (!order) {
+            toast({ title: "Error", description: "Failed to create order.", variant: "destructive" });
+            setIsProcessing(false);
+            return;
+          }
+
+          const prepared = prepareOrder("online");
+
+          // Send to Google Sheet
+          sendToGoogleSheet(buildSheetPayload(prepared.orderId, "online"));
+
+          setLastOrder({
+            orderNumber: prepared.orderId,
+            whatsappMessage: prepared.whatsappMessage,
+            orderType: prepared.orderType,
+            items: prepared.items,
+            subtotal: prepared.subtotal,
+            delivery: prepared.delivery,
+            discount: prepared.discount,
+            total: prepared.total,
+            payment: prepared.payment,
+          });
+
+          await clearCart();
+          if (orderType === "delivery") clearDelivery();
+          setDetailedAddress({ flatNo: "", building: "", area: "", pincode: "" });
+
+          setIsProcessing(false);
+          setTimeout(() => setConfirmDialogOpen(true), 300);
         },
         prefill: {
           name: profile?.name || "",
@@ -476,6 +500,13 @@ Please confirm delivery time.`;
                 </p>
               </div>
 
+              {/* Minimum order warning for delivery */}
+              {isBelowDeliveryMinimum && paymentMethod === "cod" && (
+                <p className="text-xs text-center text-destructive font-montserrat font-medium">
+                  Minimum ₹149 required for delivery
+                </p>
+              )}
+
               {/* Action Buttons */}
               <div className="space-y-2">
                 {paymentMethod === "cod" ? (
@@ -483,17 +514,12 @@ Please confirm delivery time.`;
                     <Button
                       className="w-full" variant="brand" size="lg"
                       onClick={handleCODOrder}
-                      disabled={!canPlaceOrder() || isProcessing || !isCODAllowed}
+                      disabled={!canPlaceOrder() || isProcessing || isBelowDeliveryMinimum}
                     >
                       <Banknote className="h-4 w-4 mr-2" />
                       {orderType === "pickup" ? "Pay on Pickup" : "Pay on Delivery"}
                     </Button>
-    {!isCODAllowed && (
-                      <p className="text-xs text-center text-destructive font-montserrat">
-                        Minimum order value is ₹{COD_MINIMUM}
-                      </p>
-                    )}
-                    {isCODAllowed && (
+                    {!isBelowDeliveryMinimum && (
                       <p className="text-xs text-center text-muted-foreground font-montserrat">
                         Our team will confirm your order on WhatsApp before {orderType === "pickup" ? "preparation" : "delivery"}.
                       </p>
@@ -519,22 +545,71 @@ Please confirm delivery time.`;
         </SheetContent>
       </Sheet>
 
-      {/* Post-Order Confirmation Dialog */}
+      {/* Confirm Your Order Modal */}
       <Dialog open={confirmDialogOpen} onOpenChange={setConfirmDialogOpen}>
-        <DialogContent className="sm:max-w-sm">
-          <DialogTitle className="font-bebas text-2xl tracking-wider text-center">Order Placed! 🎉</DialogTitle>
-          <DialogDescription className="text-center text-sm text-muted-foreground">
-            Your order <span className="font-semibold text-foreground">{lastOrder?.orderNumber}</span> has been saved.
-          </DialogDescription>
-          <div className="space-y-3 pt-2">
+        <DialogContent className="sm:max-w-md">
+          <DialogHeader>
+            <DialogTitle className="font-bebas text-2xl tracking-wider text-center">Confirm Your Order</DialogTitle>
+            <DialogDescription className="text-center text-sm text-muted-foreground">
+              Review your order details before sending on WhatsApp.
+            </DialogDescription>
+          </DialogHeader>
+
+          {lastOrder && (
+            <div className="space-y-3 text-sm font-montserrat">
+              <div className="flex justify-between">
+                <span className="text-muted-foreground">Order ID</span>
+                <span className="font-semibold">{lastOrder.orderNumber}</span>
+              </div>
+              <div className="flex justify-between">
+                <span className="text-muted-foreground">Order Type</span>
+                <span>{lastOrder.orderType}</span>
+              </div>
+              <Separator />
+              <div className="space-y-1">
+                <span className="text-muted-foreground text-xs">Items:</span>
+                {lastOrder.items.map((item, idx) => (
+                  <div key={idx} className="flex justify-between">
+                    <span>{item.item_name} x{item.quantity}</span>
+                    <span>₹{(item.item_price * item.quantity).toFixed(2)}</span>
+                  </div>
+                ))}
+              </div>
+              <Separator />
+              <div className="flex justify-between">
+                <span>Subtotal</span>
+                <span>₹{lastOrder.subtotal.toFixed(2)}</span>
+              </div>
+              <div className="flex justify-between">
+                <span>Delivery</span>
+                <span>₹{lastOrder.delivery}</span>
+              </div>
+              {lastOrder.discount > 0 && (
+                <div className="flex justify-between text-green-600">
+                  <span>Discount</span>
+                  <span>-₹{lastOrder.discount}</span>
+                </div>
+              )}
+              <div className="flex justify-between font-semibold text-base">
+                <span>Total</span>
+                <span className="text-primary">₹{lastOrder.total.toFixed(2)}</span>
+              </div>
+              <div className="flex justify-between">
+                <span className="text-muted-foreground">Payment</span>
+                <span>{lastOrder.payment}</span>
+              </div>
+            </div>
+          )}
+
+          <DialogFooter className="flex flex-col gap-2 sm:flex-col">
             <Button className="w-full" variant="brand" size="lg" onClick={handleSendWhatsApp}>
               <Send className="h-4 w-4 mr-2" />
-              Send Order on WhatsApp
+              Send to WhatsApp
             </Button>
-            <p className="text-xs text-muted-foreground text-center">
-              Send your order details to confirm preparation.
-            </p>
-          </div>
+            <Button variant="outline" size="sm" className="w-full" onClick={() => { setConfirmDialogOpen(false); setLastOrder(null); }}>
+              Edit Order
+            </Button>
+          </DialogFooter>
         </DialogContent>
       </Dialog>
     </>

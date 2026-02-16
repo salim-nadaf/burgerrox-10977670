@@ -16,8 +16,7 @@ const Hero = () => {
           fetchPriority="high"
           decoding="async"
         />
-        <div className="absolute inset-0 bg-black/50"></div>
-        <div className="absolute inset-0 bg-gradient-to-t from-black/60 via-black/30 to-transparent"></div>
+        <div className="absolute inset-0 bg-[#FFD939]/40"></div>
       </div>
 
       {/* Restaurant Guru Badge - clean overlay, no white circle */}

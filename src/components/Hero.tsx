@@ -3,7 +3,7 @@ import heroImage from "@/assets/hero-burger.jpg";
 
 const Hero = () => {
   return (
-    <section className="relative min-h-[80vh] flex items-center justify-center overflow-hidden" aria-labelledby="hero-heading">
+    <section className="relative min-h-[80vh] flex items-center justify-center overflow-hidden" aria-labelledby="hero-heading" style={{ containIntrinsicSize: 'auto 80vh', aspectRatio: '16/9' }}>
       {/* Background Image */}
       <div className="absolute inset-0 z-0" aria-hidden="true">
         <img 
@@ -45,7 +45,7 @@ const Hero = () => {
             Rockin' homemade flavor
           </p>
 
-          <p className="font-montserrat text-sm md:text-base text-white/90">
+          <p className="font-montserrat text-sm md:text-base text-white font-medium drop-shadow-md">
             Every burger made with our homemade signature sauce.
           </p>
 

@@ -13,7 +13,7 @@ const About = () => {
                 <div className="grid lg:grid-cols-2 gap-12 items-center">
                     <div className="oval-image-wrapper">
                         <div className="oval-frame">
-                            <img src={brotherSisterImage} alt="Brother and Sister Duo - Founders of Burger Rox with Burger Rox Logo" className="oval-image" loading="lazy" />
+                            <img src={brotherSisterImage} alt="Brother and Sister Duo - Founders of Burger Rox with Burger Rox Logo" className="oval-image" width="350" height="350" loading="lazy" decoding="async" />
                         </div>
                     </div>
                     <div className="space-y-6">

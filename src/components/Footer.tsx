@@ -11,7 +11,10 @@ const Footer = () => {
               src={brLogo} 
               alt="Burger Rox Logo" 
               className="h-16 md:h-20 w-auto mb-2"
+              width="80"
+              height="80"
               loading="lazy"
+              decoding="async"
             />
             <p className="font-allura text-xl tracking-wide text-accent-foreground/80">
               Rockin' homemade flavor

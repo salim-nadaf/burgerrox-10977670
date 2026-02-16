@@ -394,6 +394,8 @@ const MenuPage = ({ showAll = false }: MenuPageProps) => {
                           src={restaurantGuruCertificate}
                           alt="Restaurant Guru Certificate - Burger Rox Recommended 2025"
                           className="w-full max-w-[200px] mx-auto rounded-lg shadow-md"
+                          width="200"
+                          height="283"
                           loading="lazy"
                           decoding="async"
                         />

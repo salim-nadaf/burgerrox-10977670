@@ -11,6 +11,7 @@ import { useOrders } from "@/hooks/useOrders";
 import { useDelivery } from "@/hooks/useDelivery";
 import { toast } from "@/components/ui/use-toast";
 import { supabase } from "@/integrations/supabase/client";
+import { loadRazorpay } from "@/utils/loadRazorpay";
 import OrderTypeSelector, { OrderType, RESTAURANT_ADDRESS } from "./OrderTypeSelector";
 import DeliveryAddressInput from "./DeliveryAddressInput";
 import { DetailedAddress, isAddressComplete, formatFullAddress } from "./DetailedAddressForm";
@@ -68,15 +69,7 @@ const Cart = () => {
     return () => window.removeEventListener("cart-item-added", handleCartItemAdded);
   }, []);
 
-  // Load Razorpay script
-  useEffect(() => {
-    if (!document.querySelector('script[src="https://checkout.razorpay.com/v1/checkout.js"]')) {
-      const script = document.createElement("script");
-      script.src = "https://checkout.razorpay.com/v1/checkout.js";
-      script.async = true;
-      document.body.appendChild(script);
-    }
-  }, []);
+  // Razorpay is now loaded on-demand via loadRazorpay() when Pay Online is clicked
 
   const deliveryCharge = orderType === "delivery" && deliveryInfo ? deliveryInfo.charge : 0;
   const ONLINE_DISCOUNT = 10;
@@ -289,6 +282,8 @@ Please confirm order and expected time.`;
 
     setIsProcessing(true);
     try {
+      await loadRazorpay();
+
       const { data, error } = await supabase.functions.invoke("create-razorpay-order", {
         body: { amount: grandTotal, currency: "INR" },
       });

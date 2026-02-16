@@ -10,6 +10,15 @@ interface CartItem {
   quantity: number;
 }
 
+const validateCartItem = (item: { item_name?: string; item_price?: number; quantity?: number }): boolean => {
+  if (!item.item_name || typeof item.item_name !== 'string') return false;
+  const name = item.item_name.trim();
+  if (name.length < 2 || name.length > 200) return false;
+  if (typeof item.item_price !== 'number' || item.item_price <= 0 || item.item_price > 10000) return false;
+  if (typeof item.quantity !== 'number' || !Number.isInteger(item.quantity) || item.quantity < 1 || item.quantity > 100) return false;
+  return true;
+};
+
 interface CartContextType {
   cartItems: CartItem[];
   addToCart: (itemName: string, itemPrice: number) => Promise<void>;
@@ -51,6 +60,8 @@ export function CartProvider({ children }: { children: React.ReactNode }) {
         .eq('user_id', user!.id);
 
       for (const gi of guestItems) {
+        if (!validateCartItem(gi)) continue; // Skip invalid items
+        gi.item_name = gi.item_name.trim();
         const existing = (existingItems || []).find((e: any) => e.item_name === gi.item_name);
         if (existing) {
           // Update quantity
@@ -99,13 +110,18 @@ export function CartProvider({ children }: { children: React.ReactNode }) {
     if (!user) {
       // Save to localStorage for guest users
       try {
-        const raw = localStorage.getItem('guest_cart');
+      const raw = localStorage.getItem('guest_cart');
         const guestItems: { item_name: string; item_price: number; quantity: number }[] = raw ? JSON.parse(raw) : [];
+        const newItem = { item_name: itemName, item_price: itemPrice, quantity: 1 };
+        if (!validateCartItem(newItem)) {
+          console.error('Invalid cart item data');
+          return;
+        }
         const existing = guestItems.find(i => i.item_name === itemName);
         if (existing) {
-          existing.quantity += 1;
+          existing.quantity = Math.min(existing.quantity + 1, 100);
         } else {
-          guestItems.push({ item_name: itemName, item_price: itemPrice, quantity: 1 });
+          guestItems.push(newItem);
         }
         localStorage.setItem('guest_cart', JSON.stringify(guestItems));
       } catch (e) {

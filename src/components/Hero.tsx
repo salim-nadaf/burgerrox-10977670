@@ -3,7 +3,7 @@ import heroImage from "@/assets/hero-burger.jpg";
 
 const Hero = () => {
   return (
-    <section className="relative min-h-[80vh] flex items-center justify-center overflow-hidden" aria-labelledby="hero-heading" style={{ containIntrinsicSize: 'auto 80vh', aspectRatio: '16/9' }}>
+    <section className="relative min-h-[80vh] flex items-center justify-center overflow-hidden max-w-full" aria-labelledby="hero-heading">
       {/* Background Image */}
       <div className="absolute inset-0 z-0" aria-hidden="true">
         <img 
@@ -49,7 +49,7 @@ const Hero = () => {
             Every burger made with our homemade signature sauce.
           </p>
 
-          <div className="pt-4">
+          <div className="pt-4 flex flex-col sm:flex-row gap-4 justify-center">
             <Button 
               variant="hero" 
               size="xl" 
@@ -58,6 +58,15 @@ const Hero = () => {
               aria-label="Order from menu"
             >
               Order Your Fix
+            </Button>
+            <Button 
+              variant="outline" 
+              size="xl" 
+              className="w-full sm:w-auto border-white text-white hover:bg-white/20 hover:text-white font-bebas text-lg tracking-wider"
+              onClick={() => window.location.href = '/menu'}
+              aria-label="View full menu"
+            >
+              View Menu
             </Button>
           </div>
         </div>

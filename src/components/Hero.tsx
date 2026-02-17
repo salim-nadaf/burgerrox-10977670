@@ -7,16 +7,19 @@ const Hero = () => {
     <section className="relative min-h-[80vh] flex items-center justify-center overflow-hidden max-w-full" aria-labelledby="hero-heading">
       {/* Background Image */}
       <div className="absolute inset-0 z-0" aria-hidden="true">
-        <img 
-          src={heroImage} 
-          alt="" 
-          className="w-full h-full object-cover"
-          width="1920"
-          height="1080"
-          loading="eager"
-          fetchPriority="high"
-          decoding="async"
-        />
+        <picture>
+          <source srcSet="/hero-burger.webp" type="image/webp" />
+          <img 
+            src={heroImage} 
+            alt="" 
+            className="w-full h-full object-cover"
+            width="1920"
+            height="1080"
+            loading="eager"
+            fetchPriority="high"
+            decoding="async"
+          />
+        </picture>
         <div className="absolute inset-0 bg-[#FFD939]/40"></div>
       </div>
 

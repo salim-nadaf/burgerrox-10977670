@@ -112,16 +112,10 @@ const Header = () => {
                 variant="brand" 
                 size="lg" 
                 className="hidden lg:flex"
-                onClick={() => {
-                  if (location.pathname === '/') {
-                    document.getElementById('menu')?.scrollIntoView({ behavior: 'smooth' });
-                  } else {
-                    navigate('/menu');
-                  }
-                }}
-                aria-label="Order now"
+                onClick={() => navigate('/menu')}
+                aria-label="View menu"
               >
-                Order Now
+                View Menu
               </Button>
             </div>
             
@@ -252,23 +246,17 @@ const Header = () => {
                   </div>
 
                   {/* Order Button */}
-                  <Button 
+                   <Button 
                     variant="brand" 
                     size="lg" 
                     className="w-full mt-6"
                     onClick={() => {
                       setMobileMenuOpen(false);
-                      if (location.pathname === '/') {
-                        setTimeout(() => {
-                          document.getElementById('menu')?.scrollIntoView({ behavior: 'smooth' });
-                        }, 300);
-                      } else {
-                        navigate('/menu');
-                      }
+                      navigate('/menu');
                     }}
-                    aria-label="Order now"
+                    aria-label="View menu"
                   >
-                    Order Now
+                    View Menu
                   </Button>
                 </div>
               </SheetContent>

@@ -222,13 +222,14 @@ const MenuPage = ({ showAll = false }: MenuPageProps) => {
 
     return (
       <article key={item.name} role="listitem">
-        <Card className="border-2 border-border hover:border-primary transition-all duration-300 hover:shadow-brand h-full">
+        <Card className="border border-border hover:border-primary transition-all duration-300 h-full" style={{ boxShadow: '0 8px 20px rgba(0,0,0,0.08)' }}>
           <CardContent className="p-4">
             <div className="flex gap-3 mb-4">
               <img
                 src={getItemImage(item.name, item.category)}
                 alt={`${item.name} - ${item.description}`}
-                className="w-20 h-20 rounded-lg object-cover object-center flex-shrink-0 aspect-square"
+                className="w-20 h-20 rounded-lg object-cover object-center flex-shrink-0"
+                style={{ aspectRatio: '1/1' }}
                 width="80"
                 height="80"
                 loading="lazy"
@@ -265,7 +266,7 @@ const MenuPage = ({ showAll = false }: MenuPageProps) => {
 
             {/* Combo choice */}
             {item.comboChoice && (
-              <div className="mb-4 p-3 border rounded-lg bg-muted/30">
+              <div className="mb-4 p-3 border border-border/50 rounded-lg bg-muted/20">
                 <p className="font-montserrat text-xs font-medium text-foreground mb-2">Choose one:</p>
                 <RadioGroup value={comboChoice} onValueChange={(v) => setComboChoice(item.name, v)} className="space-y-1">
                   <div className="flex items-center space-x-2">
@@ -282,7 +283,7 @@ const MenuPage = ({ showAll = false }: MenuPageProps) => {
 
             {/* Add-ons for burgers */}
             {item.hasAddons && (
-              <div className="mb-4 p-3 border rounded-lg bg-muted/30">
+              <div className="mb-4 p-3 border border-border/50 rounded-lg bg-muted/20">
                 <p className="font-montserrat text-xs font-medium text-foreground mb-2">Add-ons:</p>
                 <div className="space-y-1.5">
                   {BURGER_ADDONS.map(addon => (

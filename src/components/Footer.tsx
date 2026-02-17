@@ -6,17 +6,17 @@ const Footer = () => {
     <footer className="py-12 bg-accent" role="contentinfo" aria-label="Site footer">
       <div className="container mx-auto px-4">
         <div className="grid md:grid-cols-3 gap-8 items-center">
-          <div className="flex flex-col items-center md:items-start">
+          <div className="flex flex-col items-center">
             <img 
               src={brLogo} 
               alt="Burger Rox Logo" 
-              className="h-16 md:h-20 w-auto mb-2"
+              className="h-16 md:h-20 w-auto mb-3"
               width="80"
               height="80"
               loading="lazy"
               decoding="async"
             />
-            <p className="font-allura text-xl tracking-wide text-accent-foreground">
+            <p className="font-allura text-xl tracking-wide text-accent-foreground text-center">
               Rockin' homemade flavor
             </p>
           </div>

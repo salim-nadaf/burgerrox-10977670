@@ -5,7 +5,7 @@ import { Flame, Heart, Leaf } from 'lucide-react';
 
 const About = () => {
     return (
-        <section id="about" className="py-20 bg-card relative overflow-hidden">
+        <section id="about" className="py-20 bg-background relative overflow-hidden">
             {/* Top accent line */}
             <div className="absolute top-0 left-0 w-full h-1 bg-primary" aria-hidden="true" />
 
@@ -22,21 +22,21 @@ const About = () => {
 
                 {/* USP Cards */}
                 <div className="grid sm:grid-cols-3 gap-6 mb-16 max-w-3xl mx-auto">
-                    <div className="text-center p-6 rounded-xl bg-background border border-border hover:border-primary transition-all duration-300" style={{ boxShadow: '0 8px 20px rgba(0,0,0,0.08)' }}>
+                    <div className="text-center p-6 rounded-xl bg-card border border-border hover:border-primary transition-all duration-300" style={{ boxShadow: '0 4px 12px rgba(0,0,0,0.08)' }}>
                         <div className="inline-flex items-center justify-center w-14 h-14 rounded-full bg-primary mb-4">
                             <Flame className="h-7 w-7 text-primary-foreground" />
                         </div>
                         <h3 className="font-bebas text-2xl text-foreground tracking-wide mb-1">FLAME GRILLED</h3>
                         <p className="font-montserrat text-sm text-muted-foreground">Every patty kissed by real flames for that smoky crunch.</p>
                     </div>
-                    <div className="text-center p-6 rounded-xl bg-background border border-border hover:border-primary transition-all duration-300" style={{ boxShadow: '0 8px 20px rgba(0,0,0,0.08)' }}>
+                    <div className="text-center p-6 rounded-xl bg-card border border-border hover:border-primary transition-all duration-300" style={{ boxShadow: '0 4px 12px rgba(0,0,0,0.08)' }}>
                         <div className="inline-flex items-center justify-center w-14 h-14 rounded-full bg-primary mb-4">
                             <Heart className="h-7 w-7 text-primary-foreground" />
                         </div>
                         <h3 className="font-bebas text-2xl text-foreground tracking-wide mb-1">MADE WITH LOVE</h3>
                         <p className="font-montserrat text-sm text-muted-foreground">Homemade sauces & recipes perfected over years.</p>
                     </div>
-                    <div className="text-center p-6 rounded-xl bg-background border border-border hover:border-primary transition-all duration-300" style={{ boxShadow: '0 8px 20px rgba(0,0,0,0.08)' }}>
+                    <div className="text-center p-6 rounded-xl bg-card border border-border hover:border-primary transition-all duration-300" style={{ boxShadow: '0 4px 12px rgba(0,0,0,0.08)' }}>
                         <div className="inline-flex items-center justify-center w-14 h-14 rounded-full bg-primary mb-4">
                             <Leaf className="h-7 w-7 text-primary-foreground" />
                         </div>

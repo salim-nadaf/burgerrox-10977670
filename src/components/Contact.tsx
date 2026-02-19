@@ -18,7 +18,7 @@ const Contact = () => {
         <div className="grid lg:grid-cols-2 gap-12 max-w-5xl mx-auto">
           {/* Info Cards */}
           <div className="space-y-6">
-            <div className="flex items-start space-x-4 p-5 rounded-xl bg-card border border-border hover:border-primary transition-all duration-300" style={{ boxShadow: '0 8px 20px rgba(0,0,0,0.06)' }}>
+            <div className="flex items-start space-x-4 p-5 rounded-xl bg-card border border-border hover:border-primary transition-all duration-300" style={{ boxShadow: '0 4px 12px rgba(0,0,0,0.06)' }}>
               <div className="flex-shrink-0 w-12 h-12 rounded-full bg-primary flex items-center justify-center">
                 <MapPin className="text-primary-foreground" size={20} />
               </div>
@@ -28,7 +28,7 @@ const Contact = () => {
               </div>
             </div>
 
-            <div className="flex items-start space-x-4 p-5 rounded-xl bg-card border border-border hover:border-primary transition-all duration-300" style={{ boxShadow: '0 8px 20px rgba(0,0,0,0.06)' }}>
+            <div className="flex items-start space-x-4 p-5 rounded-xl bg-card border border-border hover:border-primary transition-all duration-300" style={{ boxShadow: '0 4px 12px rgba(0,0,0,0.06)' }}>
               <div className="flex-shrink-0 w-12 h-12 rounded-full bg-primary flex items-center justify-center">
                 <Clock className="text-primary-foreground" size={20} />
               </div>
@@ -41,7 +41,7 @@ const Contact = () => {
               </div>
             </div>
 
-            <div className="flex items-start space-x-4 p-5 rounded-xl bg-card border border-border hover:border-primary transition-all duration-300" style={{ boxShadow: '0 8px 20px rgba(0,0,0,0.06)' }}>
+            <div className="flex items-start space-x-4 p-5 rounded-xl bg-card border border-border hover:border-primary transition-all duration-300" style={{ boxShadow: '0 4px 12px rgba(0,0,0,0.06)' }}>
               <div className="flex-shrink-0 w-12 h-12 rounded-full bg-primary flex items-center justify-center">
                 <Phone className="text-primary-foreground" size={20} />
               </div>
@@ -84,7 +84,7 @@ const Contact = () => {
               </div>
             </div>
 
-            <div className="text-center p-6 rounded-xl bg-card border border-border" style={{ boxShadow: '0 8px 20px rgba(0,0,0,0.06)' }}>
+            <div className="text-center p-6 rounded-xl bg-card border border-border" style={{ boxShadow: '0 4px 12px rgba(0,0,0,0.06)' }}>
               <h3 className="font-bebas text-2xl text-foreground tracking-wide mb-3">
                 FOLLOW THE ROX
               </h3>

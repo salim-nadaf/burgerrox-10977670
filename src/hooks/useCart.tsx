@@ -2,6 +2,7 @@ import { useState, useEffect, createContext, useContext } from 'react';
 import { supabase } from '@/integrations/supabase/client';
 import { useAuth } from './useAuth';
 import { toast } from '@/components/ui/use-toast';
+import { trackAddToCart } from '@/utils/metaPixel';
 
 interface CartItem {
   id: string;
@@ -170,6 +171,7 @@ export function CartProvider({ children }: { children: React.ReactNode }) {
 
         setCartItems(prev => [...prev, data]);
         window.dispatchEvent(new CustomEvent('cart-item-added'));
+        trackAddToCart(itemName, itemPrice);
         toast({
           title: "Added to Cart ✓",
           description: `${itemName} added to your cart`,

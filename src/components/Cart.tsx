@@ -12,6 +12,7 @@ import { useDelivery } from "@/hooks/useDelivery";
 import { toast } from "@/components/ui/use-toast";
 import { supabase } from "@/integrations/supabase/client";
 import { loadRazorpay } from "@/utils/loadRazorpay";
+import { trackInitiateCheckout, trackPurchase } from "@/utils/metaPixel";
 import OrderTypeSelector, { OrderType, RESTAURANT_ADDRESS } from "./OrderTypeSelector";
 import DeliveryAddressInput from "./DeliveryAddressInput";
 import { DetailedAddress, isAddressComplete, formatFullAddress } from "./DetailedAddressForm";
@@ -68,6 +69,13 @@ const Cart = () => {
     window.addEventListener("cart-item-added", handleCartItemAdded);
     return () => window.removeEventListener("cart-item-added", handleCartItemAdded);
   }, []);
+
+  // Track InitiateCheckout when cart opens with items
+  useEffect(() => {
+    if (isOpen && cartItems.length > 0) {
+      trackInitiateCheckout(totalAmount, itemCount);
+    }
+  }, [isOpen]);
 
   // Razorpay is now loaded on-demand via loadRazorpay() when Pay Online is clicked
 
@@ -247,6 +255,7 @@ Please confirm order and expected time.`;
 
     // Send to Google Sheet (non-blocking)
     sendToGoogleSheet(buildSheetPayload(prepared.orderId, "cod"));
+    trackPurchase(prepared.orderId, prepared.total);
 
     setLastOrder({
       orderNumber: prepared.orderId,
@@ -326,6 +335,7 @@ Please confirm order and expected time.`;
 
           // Send to Google Sheet
           sendToGoogleSheet(buildSheetPayload(prepared.orderId, "online"));
+          trackPurchase(prepared.orderId, prepared.total);
 
           setLastOrder({
             orderNumber: prepared.orderId,

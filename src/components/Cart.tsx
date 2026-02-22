@@ -257,7 +257,7 @@ Please confirm order and expected time.`;
     // Send to Google Sheet (non-blocking)
     sendToGoogleSheet(buildSheetPayload(prepared.orderId, "cod"));
     const purchaseContents = prepared.items.map(i => ({ id: i.item_name, quantity: i.quantity }));
-    trackPurchase(prepared.orderId, prepared.total, purchaseContents);
+    trackPurchase(prepared.total, purchaseContents);
 
     setLastOrder({
       orderNumber: prepared.orderId,
@@ -338,7 +338,7 @@ Please confirm order and expected time.`;
           // Send to Google Sheet
           sendToGoogleSheet(buildSheetPayload(prepared.orderId, "online"));
           const purchaseContents = prepared.items.map(i => ({ id: i.item_name, quantity: i.quantity }));
-          trackPurchase(prepared.orderId, prepared.total, purchaseContents);
+          trackPurchase(prepared.total, purchaseContents);
 
           setLastOrder({
             orderNumber: prepared.orderId,

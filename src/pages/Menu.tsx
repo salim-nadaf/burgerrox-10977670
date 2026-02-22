@@ -11,7 +11,7 @@ const Menu = () => {
     if (metaDesc) {
       metaDesc.setAttribute("content", "Browse Burger Rox full menu. Chicken burgers, veggie options, crispy fries, combos & desserts. Prices start at ₹79. Order on WhatsApp for 30-min delivery in Pune.");
     }
-    trackViewContent("Full Menu", "Menu");
+    trackViewContent("Full Menu");
   }, []);
 
   return (

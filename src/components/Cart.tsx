@@ -180,7 +180,6 @@ Please confirm order and expected time.`;
   };
 
   const canPlaceOrder = () => {
-    if (!user) return false;
     if (cartItems.length === 0) return false;
     if (orderType === "delivery") {
       if (!deliveryInfo) return false;

@@ -595,15 +595,7 @@ Please confirm order and expected time.`;
                 </div>
               )}
 
-              {/* WhatsApp confirmation note */}
-              <p className="text-xs text-center text-muted-foreground font-montserrat">
-                We'll confirm your order on WhatsApp at checkout.
-              </p>
-
-              {/* Urgency + USP messages */}
-              <p className="text-xs text-center text-muted-foreground font-montserrat italic">
-                Fresh batches made daily – limited evening slots.
-              </p>
+              {/* Signature sauce note */}
               <p className="text-xs text-center text-muted-foreground font-montserrat">
                 Every burger made with our homemade signature sauce.
               </p>

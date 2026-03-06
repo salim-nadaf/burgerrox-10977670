@@ -5,25 +5,29 @@ import { Badge } from "@/components/ui/badge";
 import { Checkbox } from "@/components/ui/checkbox";
 import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group";
 import { Label } from "@/components/ui/label";
-// Specific menu item images
-import blazeChickenImg from "@/assets/Blaze Chicken Burger.jpg";
-import blazeVegImg from "@/assets/Blaze Veg Burger.jpg";
-import alooRockImg from "@/assets/Aloo Rock Burger.jpg";
-import eggBurgerImage from "@/assets/egg-burger.jpg";
-import doubleChickenImg from "@/assets/double-blaze-chicken-sm.webp";
-import doubleVegImg from "@/assets/Double Blaze Veg.jpg";
-import zingerImg from "@/assets/Burger Rox Zinger.jpg";
-import blazeComboImg from "@/assets/blaze-combo-sm.webp";
-import zingerComboImg from "@/assets/zinger-combo-sm.webp";
-import saltedFriesImg from "@/assets/Salted Fries.jpg";
-import periPeriFriesImg from "@/assets/Peri Peri Fries.jpg";
-import potatoWedgesImg from "@/assets/potato-wedges-menu.webp";
-import chickenPopcornImg from "@/assets/chicken-popcorn-sm.webp";
-import lavaCakeImage from "@/assets/lava-cake.jpg";
-import chickenBurgerImage from "@/assets/chicken-burger.jpg";
+// Menu item images with explicit resize directives
+import blazeChickenImg from "@/assets/Blaze Chicken Burger.jpg?w=150&format=webp&quality=65";
+import blazeVegImg from "@/assets/Blaze Veg Burger.jpg?w=150&format=webp&quality=65";
+import alooRockImg from "@/assets/Aloo Rock Burger.jpg?w=150&format=webp&quality=65";
+import eggBurgerImage from "@/assets/egg-burger.jpg?w=150&format=webp&quality=65";
+import doubleChickenImg from "@/assets/double-blaze-chicken-sm.webp?w=150&format=webp&quality=65";
+import doubleVegImg from "@/assets/Double Blaze Veg.jpg?w=150&format=webp&quality=65";
+import zingerImg from "@/assets/Burger Rox Zinger.jpg?w=150&format=webp&quality=65";
+import blazeComboImg from "@/assets/blaze-combo-sm.webp?w=150&format=webp&quality=65";
+import zingerComboImg from "@/assets/zinger-combo-sm.webp?w=150&format=webp&quality=65";
+import saltedFriesImg from "@/assets/Salted Fries.jpg?w=150&format=webp&quality=65";
+import periPeriFriesImg from "@/assets/Peri Peri Fries.jpg?w=150&format=webp&quality=65";
+import potatoWedgesImg from "@/assets/potato-wedges-menu.webp?w=150&format=webp&quality=65";
+import chickenPopcornImg from "@/assets/chicken-popcorn-sm.webp?w=150&format=webp&quality=65";
+import lavaCakeImage from "@/assets/lava-cake.jpg?w=150&format=webp&quality=65";
+import chickenBurgerImage from "@/assets/chicken-burger.jpg?w=150&format=webp&quality=65";
 import { useCart } from "@/hooks/useCart";
 
-const FoodTypeIndicator = ({ type }: { type: 'veg' | 'nonveg' | 'egg' }) => {
+interface FoodTypeIndicatorProps {
+  type: 'veg' | 'nonveg' | 'egg';
+}
+
+const FoodTypeIndicator: React.FC<FoodTypeIndicatorProps> = ({ type }) => {
   const colors = {
     veg: { border: 'border-green-600', fill: 'bg-green-600' },
     nonveg: { border: 'border-red-600', fill: 'bg-red-600' },
@@ -177,7 +181,6 @@ const MenuPage = ({ showAll = false }: MenuPageProps) => {
           <img
             src={getItemImage(item.name)}
             alt={item.name}
-            sizes="72px"
             className="w-[72px] h-[72px] rounded-lg object-cover flex-shrink-0"
             width="72" height="72" loading="lazy" decoding="async"
           />
@@ -254,7 +257,7 @@ const MenuPage = ({ showAll = false }: MenuPageProps) => {
                   <span className="font-montserrat text-xs text-foreground">{variant.size}</span>
                   <div className="flex items-center gap-2">
                     <span className="font-bebas text-sm text-primary">₹{variant.price}</span>
-                    <Button onClick={() => handleAddToCart(item, variant.size, variant.price)} size="sm" className="text-xs px-3 h-7">
+                    <Button onClick={() => handleAddToCart(item, variant.size, variant.price)} size="sm" className="text-xs px-3 h-7" aria-label={`Add ${item.name} ${variant.size} to cart`}>
                       Add
                     </Button>
                   </div>
@@ -332,7 +335,7 @@ const MenuPage = ({ showAll = false }: MenuPageProps) => {
               className="w-full sm:w-auto"
               asChild
             >
-              <a href="https://wa.me/919321389985" target="_blank" rel="noopener noreferrer" aria-label="Order on WhatsApp">
+              <a href="https://wa.me/919321389985" target="_blank" rel="noopener noreferrer">
                 📲 Order on WhatsApp
               </a>
             </Button>

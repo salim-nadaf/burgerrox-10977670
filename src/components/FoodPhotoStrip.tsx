@@ -1,10 +1,10 @@
 import { useRef } from "react";
-import fullMeal from "@/assets/full-meal-sm.webp";
-import potatoWedges from "@/assets/potato-wedges-sm.webp";
-import lavaCake from "@/assets/lava-cake-sm.webp";
-import vegCrispy from "@/assets/veg-crispy-sm.webp";
-import variety from "@/assets/variety-sm.webp";
-import zingerPacked from "@/assets/Zinger burgers are getting packed.jpg.webp";
+import fullMeal from "@/assets/full-meal-sm.webp?w=200&format=webp&quality=60";
+import potatoWedges from "@/assets/potato-wedges-sm.webp?w=200&format=webp&quality=60";
+import lavaCake from "@/assets/lava-cake-sm.webp?w=200&format=webp&quality=60";
+import vegCrispy from "@/assets/veg-crispy-sm.webp?w=200&format=webp&quality=60";
+import variety from "@/assets/variety-sm.webp?w=200&format=webp&quality=60";
+import zingerPacked from "@/assets/Zinger burgers are getting packed.jpg.webp?w=200&format=webp&quality=60";
 
 const PHOTOS = [
   { src: fullMeal, alt: "Full meal combo with burger and fries" },
@@ -28,16 +28,15 @@ const FoodPhotoStrip = () => {
         {/* Desktop — single row */}
         <div className="hidden sm:grid sm:grid-cols-6 gap-2 max-w-4xl mx-auto">
           {PHOTOS.map((p) => (
-            <div key={p.alt} className="overflow-hidden rounded-lg aspect-square group" style={{ contentVisibility: 'auto', containIntrinsicSize: '200px' }}>
+            <div key={p.alt} className="overflow-hidden rounded-lg aspect-square group" style={{ contentVisibility: 'auto', containIntrinsicSize: '150px' }}>
               <img
                 src={p.src}
                 alt={p.alt}
-                sizes="(min-width: 640px) 150px, 112px"
                 className="w-full h-full object-cover transition-transform duration-300 group-hover:scale-110"
                 loading="lazy"
                 decoding="async"
-                width="200"
-                height="200"
+                width="150"
+                height="150"
               />
             </div>
           ))}
@@ -54,7 +53,6 @@ const FoodPhotoStrip = () => {
               <img
                 src={p.src}
                 alt={p.alt}
-                sizes="112px"
                 className="w-full h-full object-cover"
                 loading="lazy"
                 decoding="async"

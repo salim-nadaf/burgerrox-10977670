@@ -1,7 +1,7 @@
 import { Button } from "@/components/ui/button";
 import { Link } from "react-router-dom";
-import heroMobile from "@/assets/hero-mobile.webp";
-import heroDesktop from "@/assets/zinger-hero.webp";
+import heroMobile from "@/assets/hero-mobile.webp?w=480&format=webp&quality=55";
+import heroDesktop from "@/assets/zinger-hero.webp?w=800&format=webp&quality=55";
 
 const Hero = () => {
   return (
@@ -56,7 +56,7 @@ const Hero = () => {
               className="w-full sm:w-auto h-12 sm:h-14 px-6 text-sm font-montserrat text-card/70 hover:text-card hover:bg-card/10"
               asChild
             >
-              <a href="https://wa.me/919321389985" target="_blank" rel="noopener noreferrer" aria-label="Order via WhatsApp">
+              <a href="https://wa.me/919321389985" target="_blank" rel="noopener noreferrer">
                 📲 WhatsApp Order
               </a>
             </Button>

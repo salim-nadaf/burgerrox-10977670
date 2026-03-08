@@ -55,16 +55,16 @@ function calculateHaversineDistance(lat1: number, lon1: number, lat2: number, lo
   return R * c;
 }
 
-function getDeliveryCharge(distanceKm: number): { charge: number; label: string } {
+function getDeliveryCharge(distanceKm: number): { charge: number; label: string; tooFar: boolean } {
+  if (distanceKm > MAX_DELIVERY_DISTANCE_KM) {
+    return { charge: 0, label: "Out of delivery range", tooFar: true };
+  }
   for (const tier of DELIVERY_TIERS) {
     if (distanceKm <= tier.maxDistance) {
-      return { charge: tier.charge, label: tier.label };
+      return { charge: tier.charge, label: tier.label, tooFar: false };
     }
   }
-  return { 
-    charge: DELIVERY_TIERS[DELIVERY_TIERS.length - 1].charge, 
-    label: DELIVERY_TIERS[DELIVERY_TIERS.length - 1].label
-  };
+  return { charge: 0, label: "Out of delivery range", tooFar: true };
 }
 
 function estimateDuration(distanceKm: number): string {

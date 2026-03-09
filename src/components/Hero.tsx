@@ -18,7 +18,6 @@ const Hero = () => {
             height="525"
             fetchPriority="high"
             decoding="sync"
-            style={{ contentVisibility: 'auto' }}
           />
         </picture>
       </div>

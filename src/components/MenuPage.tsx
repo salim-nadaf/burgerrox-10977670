@@ -6,8 +6,8 @@ import { Checkbox } from "@/components/ui/checkbox";
 import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group";
 import { Label } from "@/components/ui/label";
 // Menu item images with explicit resize directives
-import blazeChickenImg from "@/assets/Blaze Chicken Burger.jpg?w=150&format=webp&quality=65";
-import blazeVegImg from "@/assets/Blaze Veg Burger.jpg?w=150&format=webp&quality=65";
+import blazeChickenImg from "@/assets/Blaze Chicken Burger.jpg";
+import blazeVegImg from "@/assets/Blaze Veg Burger.jpg";
 import alooRockImg from "@/assets/Aloo Rock Burger.jpg";
 import eggBurgerImage from "@/assets/egg-burger.jpg";
 import doubleChickenImg from "@/assets/double-blaze-chicken-sm.webp";

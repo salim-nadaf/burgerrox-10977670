@@ -11,6 +11,7 @@ import { CartProvider } from "@/hooks/useCart";
 import { OrdersProvider } from "@/hooks/useOrders";
 import { DeliveryProvider } from "@/hooks/useDelivery";
 import CartAbandonmentBanner from "@/components/CartAbandonmentBanner";
+import AnnouncementBar from "@/components/AnnouncementBar";
 import Index from "./pages/Index";
 
 // Lazy load non-homepage routes
@@ -46,6 +47,7 @@ function AppContent() {
     <BrowserRouter>
       <ScrollToTop />
       <PageViewTracker />
+      <AnnouncementBar />
       <Suspense fallback={<RouteLoader />}>
         <Routes>
           <Route path="/" element={<Index />} />

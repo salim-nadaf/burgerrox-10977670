@@ -5,6 +5,8 @@ import { Badge } from "@/components/ui/badge";
 import { Separator } from "@/components/ui/separator";
 import { Dialog, DialogContent, DialogTitle, DialogDescription, DialogHeader, DialogFooter } from "@/components/ui/dialog";
 import { ShoppingCart, Plus, Minus, Trash2, Send, CreditCard, Banknote } from "lucide-react";
+import { Input } from "@/components/ui/input";
+import { Tag, Check } from "lucide-react";
 import { useCart } from "@/hooks/useCart";
 import { useAuth } from "@/hooks/useAuth";
 import { useDelivery } from "@/hooks/useDelivery";
@@ -86,6 +88,11 @@ const Cart = () => {
     flatNo: "", building: "", area: "", pincode: ""
   });
 
+  // Coupon state
+  const [couponInput, setCouponInput] = useState("");
+  const [appliedCoupon, setAppliedCoupon] = useState<{ code: string; amount: number; label: string } | null>(null);
+  const [couponError, setCouponError] = useState<string | null>(null);
+
   const { cartItems, addToCart, removeFromCart, updateQuantity, clearCart, totalAmount, itemCount } = useCart();
   const { user, profile } = useAuth();
   const { deliveryInfo, clearDelivery } = useDelivery();
@@ -115,7 +122,48 @@ const Cart = () => {
   const deliveryCharge = orderType === "delivery" && deliveryInfo ? deliveryInfo.charge : 0;
   const ONLINE_DISCOUNT = 10;
   const onlineDiscount = paymentMethod === "online" ? ONLINE_DISCOUNT : 0;
-  const grandTotal = totalAmount + deliveryCharge - onlineDiscount;
+  const couponDiscount = appliedCoupon?.amount ?? 0;
+  const grandTotal = Math.max(0, totalAmount + deliveryCharge - onlineDiscount - couponDiscount);
+
+  // Re-validate coupon when subtotal changes (e.g. WELCOME20 needs ₹199 min)
+  useEffect(() => {
+    if (!appliedCoupon) return;
+    if (appliedCoupon.code === "WELCOME20" && totalAmount < 199) {
+      setAppliedCoupon(null);
+      setCouponError("WELCOME20 needs a subtotal of at least ₹199");
+    }
+  }, [totalAmount, appliedCoupon]);
+
+  const applyCoupon = () => {
+    const code = couponInput.trim().toUpperCase();
+    setCouponError(null);
+    if (!code) {
+      setCouponError("Enter a coupon code");
+      return;
+    }
+    if (code === "FLAT10") {
+      setAppliedCoupon({ code, amount: 10, label: "FLAT10 — ₹10 off" });
+      setCouponInput("");
+      toast({ title: "Coupon applied ✓", description: "₹10 off your order" });
+      return;
+    }
+    if (code === "WELCOME20") {
+      if (totalAmount < 199) {
+        setCouponError("WELCOME20 needs a subtotal of at least ₹199");
+        return;
+      }
+      setAppliedCoupon({ code, amount: 20, label: "WELCOME20 — ₹20 off" });
+      setCouponInput("");
+      toast({ title: "Coupon applied ✓", description: "₹20 off your order" });
+      return;
+    }
+    setCouponError("Invalid coupon code");
+  };
+
+  const removeCoupon = () => {
+    setAppliedCoupon(null);
+    setCouponError(null);
+  };
 
   const getPaymentLabel = (pMethod: string) => {
     if (pMethod === "online") return "Paid Online";
@@ -128,6 +176,10 @@ const Cart = () => {
       .join("\n");
 
     const paymentLabel = getPaymentLabel(paymentMethod);
+    const totalDiscount = onlineDiscount + couponDiscount;
+    const discountLine = totalDiscount > 0
+      ? `-₹${totalDiscount}${appliedCoupon ? ` (incl. ${appliedCoupon.code})` : ""}`
+      : "₹0";
 
     let msg = `--- BURGER ROX ORDER ---
 
@@ -142,7 +194,7 @@ ${itemsList}
 
 Subtotal: ₹${totalAmount.toFixed(2)}
 Delivery: ${deliveryCharge === 0 ? "₹0" : `₹${deliveryCharge}`}
-Discount: ${onlineDiscount > 0 ? `-₹${onlineDiscount}` : "₹0"}
+Discount: ${discountLine}
 TOTAL: ₹${grandTotal.toFixed(2)}
 
 Payment: ${paymentLabel}`;
@@ -206,7 +258,8 @@ Please confirm order and expected time.`;
       items: itemsSummary,
       subtotal: totalAmount,
       delivery: deliveryCharge,
-      discount: pMethod === "online" ? onlineDiscount : 0,
+      discount: (pMethod === "online" ? onlineDiscount : 0) + couponDiscount,
+      coupon_code: appliedCoupon?.code || "",
       total: grandTotal,
       payment: pMethod === "online" ? "Paid Online" : orderType === "pickup" ? "Pay on Pickup" : "Pay on Delivery",
       status: "NEW",
@@ -319,12 +372,13 @@ Please confirm order and expected time.`;
       items: cartItems.map(i => ({ item_name: i.item_name, item_price: i.item_price, quantity: i.quantity })),
       subtotal: totalAmount,
       delivery: deliveryCharge,
-      discount: 0,
+      discount: couponDiscount,
       total: grandTotal,
       payment: getPaymentLabel("cod"),
     });
 
     clearCart();
+    setAppliedCoupon(null);
     if (orderType === "delivery") clearDelivery();
     setDetailedAddress({ flatNo: "", building: "", area: "", pincode: "" });
     setIsOpen(false);
@@ -400,7 +454,7 @@ Please confirm order and expected time.`;
       const capturedItems = cartItems.map(i => ({ item_name: i.item_name, item_price: i.item_price, quantity: i.quantity }));
       const capturedSubtotal = totalAmount;
       const capturedDelivery = deliveryCharge;
-      const capturedDiscount = onlineDiscount;
+      const capturedDiscount = onlineDiscount + couponDiscount;
       const capturedTotal = grandTotal;
       const capturedOrderType = orderType;
 
@@ -440,6 +494,7 @@ Please confirm order and expected time.`;
           });
 
           await clearCart();
+          setAppliedCoupon(null);
           if (capturedOrderType === "delivery") clearDelivery();
           setDetailedAddress({ flatNo: "", building: "", area: "", pincode: "" });
 
@@ -616,10 +671,52 @@ Please confirm order and expected time.`;
                     <span>-₹{ONLINE_DISCOUNT}</span>
                   </div>
                 )}
+                {appliedCoupon && (
+                  <div className="flex justify-between text-green-600">
+                    <span className="flex items-center gap-1">
+                      <Tag className="h-3 w-3" /> {appliedCoupon.code}
+                    </span>
+                    <span>-₹{appliedCoupon.amount}</span>
+                  </div>
+                )}
                 <div className="flex justify-between font-bold text-base pt-1 border-t border-border/30">
                   <span>Total</span>
                   <span className="text-primary">₹{grandTotal.toFixed(0)}</span>
                 </div>
+              </div>
+
+              {/* Coupon code field */}
+              <div className="space-y-1">
+                {appliedCoupon ? (
+                  <div className="flex items-center justify-between p-2 bg-green-600/10 border border-green-600/30 rounded-md">
+                    <span className="flex items-center gap-1.5 font-montserrat text-xs text-green-700 font-medium">
+                      <Check className="h-3.5 w-3.5" /> {appliedCoupon.label}
+                    </span>
+                    <button
+                      onClick={removeCoupon}
+                      className="text-[11px] font-montserrat text-muted-foreground hover:text-foreground underline"
+                    >
+                      Remove
+                    </button>
+                  </div>
+                ) : (
+                  <div className="flex gap-1.5">
+                    <Input
+                      value={couponInput}
+                      onChange={(e) => { setCouponInput(e.target.value); setCouponError(null); }}
+                      placeholder="Coupon code (e.g. FLAT10)"
+                      className="h-8 text-xs font-montserrat uppercase"
+                      maxLength={20}
+                      aria-label="Coupon code"
+                    />
+                    <Button onClick={applyCoupon} size="sm" variant="outline" className="h-8 px-3 text-xs">
+                      Apply
+                    </Button>
+                  </div>
+                )}
+                {couponError && (
+                  <p className="text-[11px] text-destructive font-montserrat">{couponError}</p>
+                )}
               </div>
 
               {/* Minimum order warning for delivery */}

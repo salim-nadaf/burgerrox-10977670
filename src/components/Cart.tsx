@@ -372,12 +372,13 @@ Please confirm order and expected time.`;
       items: cartItems.map(i => ({ item_name: i.item_name, item_price: i.item_price, quantity: i.quantity })),
       subtotal: totalAmount,
       delivery: deliveryCharge,
-      discount: 0,
+      discount: couponDiscount,
       total: grandTotal,
       payment: getPaymentLabel("cod"),
     });
 
     clearCart();
+    setAppliedCoupon(null);
     if (orderType === "delivery") clearDelivery();
     setDetailedAddress({ flatNo: "", building: "", area: "", pincode: "" });
     setIsOpen(false);
@@ -453,7 +454,7 @@ Please confirm order and expected time.`;
       const capturedItems = cartItems.map(i => ({ item_name: i.item_name, item_price: i.item_price, quantity: i.quantity }));
       const capturedSubtotal = totalAmount;
       const capturedDelivery = deliveryCharge;
-      const capturedDiscount = onlineDiscount;
+      const capturedDiscount = onlineDiscount + couponDiscount;
       const capturedTotal = grandTotal;
       const capturedOrderType = orderType;
 
@@ -493,6 +494,7 @@ Please confirm order and expected time.`;
           });
 
           await clearCart();
+          setAppliedCoupon(null);
           if (capturedOrderType === "delivery") clearDelivery();
           setDetailedAddress({ flatNo: "", building: "", area: "", pincode: "" });
 

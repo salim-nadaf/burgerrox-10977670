@@ -53,7 +53,7 @@ export function OrdersProvider({ children }: { children: React.ReactNode }) {
       
       // Subscribe to realtime updates
       const channel = supabase
-        .channel('orders-changes')
+        .channel(`user:${user.id}:orders`)
         .on(
           'postgres_changes',
           {

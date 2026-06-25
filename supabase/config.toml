@@ -7,13 +7,25 @@ verify_jwt = false
 verify_jwt = false
 
 [functions.calculate-delivery]
-verify_jwt = false
+verify_jwt = true
 
 [functions.google-distance]
-verify_jwt = false
+verify_jwt = true
 
 [functions.place-order]
-verify_jwt = false
+verify_jwt = true
 
 [functions.guest-orders]
-verify_jwt = false
+verify_jwt = true
+
+[functions.save-customer]
+verify_jwt = true
+
+[functions.places-autocomplete]
+verify_jwt = true
+
+[functions.places-details]
+verify_jwt = true
+
+[functions.geocode-reverse]
+verify_jwt = true

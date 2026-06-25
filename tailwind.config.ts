@@ -21,6 +21,7 @@ export default {
 			fontFamily: {
 				'bebas': ['Bebas Neue', 'sans-serif'],
 				'montserrat': ['Montserrat', 'sans-serif'],
+				'allura': ['Allura', 'cursive'],
 			},
 			colors: {
 				border: 'hsl(var(--border))',

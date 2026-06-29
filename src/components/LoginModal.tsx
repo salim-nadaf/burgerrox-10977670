@@ -140,13 +140,34 @@ const LoginModal = ({ open, onOpenChange, onSuccess }: LoginModalProps) => {
       }
 
       // Also upsert customer record
+      const customerPayload = {
+        name: guestInfo?.name || name.trim(),
+        whatsapp: guestInfo?.whatsapp || phone,
+        address: guestAddr || null,
+      };
+
       await supabase.functions.invoke("save-customer", {
-        body: {
-          name: guestInfo?.name || name.trim(),
-          whatsapp: guestInfo?.whatsapp || phone,
-          address: guestAddr || null,
-        },
+        body: customerPayload,
       });
+
+      // Send customer capture to Google Sheets
+      const GOOGLE_SHEET_WEBHOOK = "https://script.google.com/macros/s/AKfycbxKYdD8h58iJRY5QKlVWLFwXwTwPYBGItMm1CewkMpjywV9L6ROnnXgLXA_coio5Rnxwg/exec";
+      try {
+        await fetch(GOOGLE_SHEET_WEBHOOK, {
+          method: "POST",
+          mode: "no-cors",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({
+            event_type: "CUSTOMER_REGISTER_LOGIN",
+            customer_name: customerPayload.name,
+            customer_phone: customerPayload.whatsapp,
+            customer_address: customerPayload.address,
+            timestamp: new Date().toISOString(),
+          }),
+        });
+      } catch (err) {
+        console.error("Google Sheet customer capture error:", err);
+      }
     } catch (err) {
       console.error("Error linking guest data:", err);
     }
@@ -241,24 +262,45 @@ const LoginModal = ({ open, onOpenChange, onSuccess }: LoginModalProps) => {
             )}
           </Button>
 
-          <div className="text-center">
-            {mode === "login" ? (
-              <button
-                type="button"
-                className="font-montserrat text-xs text-primary hover:underline"
-                onClick={() => { setMode("signup"); setErrors({}); }}
-              >
-                New here? Create an account
-              </button>
-            ) : (
-              <button
-                type="button"
-                className="font-montserrat text-xs text-primary hover:underline"
-                onClick={() => { setMode("login"); setErrors({}); }}
-              >
-                Already have an account? Log in
-              </button>
+          <div className="text-center space-y-2.5">
+            {mode === "login" && (
+              <div>
+                <button
+                  type="button"
+                  className="font-montserrat text-xs text-muted-foreground hover:text-primary transition-colors underline"
+                  onClick={() => {
+                    toast({
+                      title: "Password Recovery",
+                      description: "For security, please send a message to WhatsApp +91 93213 89985 to reset your passcode.",
+                      duration: 6000
+                    });
+                    window.open(`https://wa.me/919321389985?text=Hi%20Burger%20Rox%20Support,%20I%20forgot%20my%20login%20password%20for%20mobile%20number:%20+91${phone}`, "_blank");
+                  }}
+                >
+                  Forgot Password?
+                </button>
+              </div>
             )}
+
+            <div>
+              {mode === "login" ? (
+                <button
+                  type="button"
+                  className="font-montserrat text-xs text-primary hover:underline"
+                  onClick={() => { setMode("signup"); setErrors({}); }}
+                >
+                  New here? Create an account
+                </button>
+              ) : (
+                <button
+                  type="button"
+                  className="font-montserrat text-xs text-primary hover:underline"
+                  onClick={() => { setMode("login"); setErrors({}); }}
+                >
+                  Already have an account? Log in
+                </button>
+              )}
+            </div>
           </div>
 
           <div className="flex items-center justify-center gap-1.5 text-xs text-muted-foreground font-montserrat">

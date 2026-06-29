@@ -7,15 +7,17 @@ const Footer = () => {
       <div className="container mx-auto px-4">
         {/* Centered Logo + Tagline */}
         <div className="flex flex-col items-center mb-8">
-          <img 
-            src={brLogo} 
-            alt="Burger Rox Logo" 
-            className="h-16 md:h-20 w-auto mb-3"
-            width="80"
-            height="80"
-            loading="lazy"
-            decoding="async"
-          />
+          <div className="bg-card p-3 rounded-full border-2 border-primary/20 ring-4 ring-primary/5 shadow-lg mb-3">
+            <img 
+              src={brLogo} 
+              alt="Burger Rox Logo" 
+              className="h-14 md:h-16 w-auto"
+              width="64"
+              height="64"
+              loading="lazy"
+              decoding="async"
+            />
+          </div>
           <p className="font-montserrat italic font-medium text-xl tracking-wide text-background text-center">
             Rockin' homemade flavor
           </p>

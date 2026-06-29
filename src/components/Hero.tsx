@@ -35,7 +35,7 @@ const Hero = () => {
           </div>
 
           <h1 id="hero-heading" className="font-bebas text-5xl sm:text-6xl md:text-7xl text-card leading-[0.95] tracking-wider">
-            BURGER ROX<br />CRAVE-WORTHY BURGERS<br /><span className="text-2xl sm:text-3xl md:text-4xl text-secondary">IN MAMURDI - RAVET</span>
+            BURGER ROX<br />CRAVE-WORTHY BURGERS<br /><span className="text-2xl sm:text-3xl md:text-4xl text-primary">IN MAMURDI - RAVET</span>
           </h1>
           
           <p className="font-montserrat text-sm sm:text-base text-card/85 max-w-sm leading-relaxed">
@@ -43,7 +43,7 @@ const Hero = () => {
           </p>
 
           <p className="font-montserrat text-xs text-card/70 flex items-center gap-1.5">
-            <span className="text-secondary">★</span> Loved by burger fans in Mamurdi–Ravet
+            <span className="text-primary">★</span> Loved by burger fans in Mamurdi–Ravet
           </p>
 
           <div className="flex flex-col sm:flex-row gap-3 pt-1">

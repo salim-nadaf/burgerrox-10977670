@@ -23,7 +23,7 @@ const Header = () => {
 
   return (
     <>
-      <header className="bg-card border-b border-border shadow-sm sticky top-0 z-50">
+      <header className="bg-background border-b border-foreground/10 shadow-sm sticky top-0 z-50">
         <div className="container mx-auto px-4 py-3">
           <div className="flex items-center justify-between">
             {/* Logo */}
@@ -94,13 +94,13 @@ const Header = () => {
               {user ? (
                 <ProfileSheet />
               ) : (
-                <Button variant="ghost" size="icon" aria-label="Log in" className="h-9 w-9" onClick={() => setLoginOpen(true)}>
+                <Button variant="ghost" size="icon" aria-label="Log in" className="h-9 w-9 text-foreground" onClick={() => setLoginOpen(true)}>
                   <User size={18} />
                 </Button>
               )}
               <Sheet open={mobileMenuOpen} onOpenChange={setMobileMenuOpen}>
                 <SheetTrigger asChild>
-                  <Button variant="ghost" size="icon" className="h-9 w-9" aria-label="Open menu">
+                  <Button variant="ghost" size="icon" className="relative text-foreground hover:text-foreground hover:bg-foreground/10" aria-label="Open menu">
                     <Menu size={18} />
                   </Button>
                 </SheetTrigger>

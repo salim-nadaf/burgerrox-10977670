@@ -37,7 +37,7 @@ const AnnouncementBar = () => {
   if (dismissed) return null;
 
   return (
-    <div className="bg-[#FF5D05] text-white" role="region" aria-label="Site announcements">
+    <div className="bg-primary text-white" role="region" aria-label="Site announcements">
       <div className="container mx-auto px-4 py-1.5 flex items-center justify-center gap-3 relative">
         <p
           key={index}

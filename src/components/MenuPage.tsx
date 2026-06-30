@@ -266,14 +266,17 @@ const MenuPage = ({ showAll = false }: MenuPageProps) => {
             <p className="font-montserrat text-[11px] font-medium text-foreground mb-1.5">Add-ons:</p>
             <div className="space-y-1">
               {BURGER_ADDONS.map(addon => (
-                <div key={addon.name} className="flex items-center justify-between">
-                  <div className="flex items-center space-x-2">
-                    <Checkbox
-                      id={`${item.name}-${addon.name}`}
-                      checked={addons.includes(addon.name)}
-                      onCheckedChange={() => toggleAddon(item.name, addon.name)}
-                    />
-                    <Label htmlFor={`${item.name}-${addon.name}`} className="text-xs font-montserrat">{addon.name}</Label>
+                <div key={addon.name} className="flex items-center justify-between py-1">
+                  <div className="flex items-center space-x-3 min-h-[32px]">
+                    <div className="flex items-center justify-center p-1.5 -m-1.5">
+                      <Checkbox
+                        id={`${item.name}-${addon.name}`}
+                        checked={addons.includes(addon.name)}
+                        onCheckedChange={() => toggleAddon(item.name, addon.name)}
+                        className="h-5 w-5"
+                      />
+                    </div>
+                    <Label htmlFor={`${item.name}-${addon.name}`} className="text-xs font-montserrat cursor-pointer py-1">{addon.name}</Label>
                   </div>
                   <span className="font-bebas text-xs text-primary">+₹{addon.price}</span>
                 </div>
@@ -291,7 +294,7 @@ const MenuPage = ({ showAll = false }: MenuPageProps) => {
                   <span className="font-montserrat text-xs text-foreground">{variant.size}</span>
                   <div className="flex items-center gap-2">
                     <span className="font-bebas text-sm text-primary">₹{variant.price}</span>
-                    <Button onClick={() => handleAddToCart(item, variant.size, variant.price)} size="sm" className="text-xs px-3 h-7" aria-label={`Add ${item.name} ${variant.size} to cart`}>
+                    <Button onClick={() => handleAddToCart(item, variant.size, variant.price)} size="sm" className="text-xs px-3 h-7" aria-label={`Add ${item.name} (${variant.size}) to cart`}>
                       Add
                     </Button>
                   </div>
@@ -321,7 +324,7 @@ const MenuPage = ({ showAll = false }: MenuPageProps) => {
             {showAll ? 'FULL MENU' : 'MENU FAVORITES'}
           </h2>
           <div className="w-12 h-1 bg-primary mx-auto mb-2" aria-hidden="true" />
-          <p className="font-montserrat text-sm text-muted-foreground max-w-lg mx-auto">
+          <p className="font-montserrat text-sm text-foreground/80 max-w-lg mx-auto">
             Fresh burgers that actually slap. No gimmicks — just good food that won't break your budget.
           </p>
         </header>

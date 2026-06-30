@@ -54,7 +54,7 @@ const GoogleReviews = () => {
           <h2 id="reviews-heading" className="font-bebas text-xl sm:text-2xl text-foreground tracking-wider">
             WHAT CUSTOMERS SAY
           </h2>
-          <span className="font-montserrat text-xs text-muted-foreground whitespace-nowrap">
+          <span className="font-montserrat text-xs text-foreground/80 whitespace-nowrap">
             ⭐ 4.7 avg rating
           </span>
         </div>

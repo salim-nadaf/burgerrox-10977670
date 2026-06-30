@@ -9,8 +9,8 @@ All colors MUST be HSL.
 @layer base {
   :root {
     /* Burger Rox Brand Colors - 60/30/10 Premium Palette
-       60% Yellow #FFD939 (background) · 30% Brown #53362D (foreground/secondary) · 10% Orange #FF5D05 (accent) */
-    --background: 48 100% 61%; /* #FFD939 - Signature Brand Yellow */
+       60% Warm Cream/Yellow (background) · 30% Brown #53362D (foreground/secondary) · 10% Orange #FF5D05 (accent) */
+    --background: 45 100% 95%; /* #FFF9E6 - Premium soft, warm buttery cream background */
     --foreground: 13 30% 25%; /* #53362D - Warm Cocoa Brown */
 
     --card: 0 0% 100%;
